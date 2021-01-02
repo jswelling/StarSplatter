@@ -1,0 +1,12 @@
+CXX= g++
+RM = rm
+AR = ar rus
+RANLIB = ranlib
+MAKEDEPEND = makedepend
+XLIBS = -L/usr/X11R6/lib -lXm -lXt -lXmu -lX11
+GLLIBS = -lGLU -lGL -lGLw
+CFLAGS += -DCOMPAQ_OSF1 -I/usr/X11R6/include -O3
+SHR_EXT = so
+SHR_LD = g++ -shared
+
+

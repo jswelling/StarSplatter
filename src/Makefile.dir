@@ -1,0 +1,78 @@
+include ${TOP}/conf/Makefile.${ARCH}
+include ${TOP}/depend.mk.${ARCH}
+
+O = ${TOP}/obj/${ARCH}
+L = ${TOP}/lib/${ARCH}
+B = ${TOP}/bin/${ARCH}
+
+SUBMAKES= doc scripts
+
+# The config file adds entries for these target lists
+BUILD_EXES = 
+FTN_BUILD_EXES = 
+BUILD_LIBS = 
+
+CSOURCE=
+
+CXXSOURCE= camera.cc geometry.cc tclrunner.cc rgbimage.cc starsplatter.cc \
+	ssplat_tcl.cc ssplat_usr_modify.cc starbunch.cc utils.cc \
+	interpolate.cc splatpainter.cc gaussiansplatpainter.cc \
+	splinesplatpainter.cc circlesplatpainter.cc cball.cc \
+	starsplatter_wrap.cxx 
+
+GENERATEDSOURCE= starsplatter_wrap.cxx
+
+PYSOURCE= 
+
+HFILES= camera.h geometry.h rgbimage.h starsplatter.h starbunch.h \
+	splatpainter.h gaussiansplatpainter.h splinesplatpainter.h \
+	circlesplatpainter.h \
+	im.h sdsc.h sdscconfig.h bin.h arg.h tag.h cball.h
+
+MISCFILES= Makefile Makefile.dir rules.mk configure conf/* \
+	starsplatter.i cball.i \
+	bin/${ARCH}/starsplatter.py \
+	data/test.tipsy data/snap_036_collision.gadget \
+	setup.py MANIFEST.in
+
+DOCFILES= README
+
+STARSPLATTEROBJ= $O/camera.o $O/geometry.o $O/tclrunner.o $O/rgbimage.o \
+	$O/ssplat_tcl.o $O/ssplat_usr_modify.o $O/starbunch.o \
+	$O/starsplatter.o $O/utils.o $O/interpolate.o $O/splatpainter.o \
+	$O/gaussiansplatpainter.o $O/splinesplatpainter.o \
+	$O/circlesplatpainter.o 
+
+SSPYLIBOBJ= $O/camera.o $O/geometry.o $O/rgbimage.o \
+	$O/ssplat_usr_modify.o $O/starbunch.o \
+	$O/starsplatter.o $O/utils.o $O/interpolate.o \
+	$O/splatpainter.o $O/gaussiansplatpainter.o $O/splinesplatpainter.o \
+	$O/circlesplatpainter.o $O/cball.o $O/starsplatter_wrap.o
+
+DEPENDSOURCE= $(CSOURCE) $(CXXSOURCE)
+
+include ${TOP}/config.mk.${ARCH}
+
+starsplatter_wrap.cxx: starsplatter.i cball.i
+	@echo "Running SWIG on starsplatter.i"
+	@$(SWIG) $(SWIGFLAGS) -c++ starsplatter.i
+	@cp starsplatter.py $B
+
+$B/starsplatter: bindir $(STARSPLATTEROBJ)
+	@echo "Linking " $@
+	$(CXX) -o $@ $(STARSPLATTEROBJ) $(LIBS)
+
+$L/_starsplatter.${SHR_EXT}: libdir $(SSPYLIBOBJ)
+	@echo "Building shared lib ${@F} "
+	@$(SHR_LD) -o $@ $(SSPYLIBOBJ) $(LIBS)
+
+$B/starsplatter.py: bindir starsplatter.i cball.i
+	@echo "Running SWIG on starsplatter.i"
+	@$(SWIG) $(SWIGFLAGS) -c++ starsplatter.i
+	@mv starsplatter.py $B
+
+$B/ssplat_gui.py: ssplat_gui.py
+	@echo "Copying ssplat_gui into place"
+	@cp ssplat_gui.py $B
+
+include ${TOP}/rules.mk

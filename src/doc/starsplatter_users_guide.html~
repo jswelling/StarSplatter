@@ -1,0 +1,966 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>StarSplatter User's Guide</title>
+  </head>
+
+  <body>
+      <h1>StarSplatter User's Guide</h1>
+
+      <hr>
+      <br clear=left>
+      <a href="ssplat_sample.jpg">
+	<img src="ssplat_sample_icon.gif" alt="picture of two disk galaxies"
+	  align=left height=90 width=120 hspace=20></a>
+      Here is a sample image produced with
+      roughly 500K particles.  This is a view of the Milky Way as seen
+      through the disk of the Andromeda Galaxy, as per an old simulation
+      by John Dubinski.
+      <br clear=left>
+      <hr>
+      
+<font size=+2>The StarSplatter Home Page is<br>
+<a href="http://www.psc.edu/Packages/StarSplatter_Home">
+http://www.psc.edu/Packages/StarSplatter_Home</a></font>
+
+      <H2>Table of Contents</H2>
+      <OL>
+	<LI><A HREF="#intro">Introduction</A>
+	<LI><A HREF="#tcland">Tcl and StarSplatter</A>
+	<LI><A HREF="#startupscript">Start-up Resource File</A>
+	<LI><A HREF="#quickstart">Quick Start</A>
+	<LI><A HREF="#theory"> Theory</A>
+	<LI><A HREF="#commands">Commands</A>
+	  <UL>
+	    <LI><A HREF="#camcom">Camera Commands</A>
+	    <LI><A HREF="#starbunchcom">Starbunch Commands</A>
+	    <LI><A HREF="#rencom">Renderer Commands</A>
+	    <LI><A HREF="#utilcom">Utility Commands</A>	      
+	  </UL>
+	<LI><A HREF="#examples">Examples</A>
+	<LI><A HREF="#tips">Operating Tips and Tricks</A>
+	<LI><A HREF="#knownbugs">Known Bugs and Work-Arounds</A>
+	<LI><A HREF="#fileformats">File Formats</A>
+	  <UL>
+	    <LI><A HREF="#tipsywritebox">TIPSY Writebox Format</A>
+	    <LI><A HREF="#dubinskiformat">Dubinski Format</A>
+	      <LI><A HREF="#generalformat">General Format</A>
+	  </UL>
+	  <LI><A HREF="#codemods">Modifying StarSplatter</A>
+      </OL>
+      
+<h2><A NAME="intro">Introduction</A></H2>
+StarSplatter is a simple program for rendering collections of particles as
+Gaussian "blobs".  Its primary purpose is to generate images of galaxies
+and such from particle simulation data.  
+StarSplatter can read the ascii output of the 
+<a href="http://hermes.astro.washington.edu/tools/TIPSY/">TIPSY</a> 
+<em>writebox</em> command, and
+some other particle formats as well.  It is fairly fast, and since it
+is controlled by a Tcl script it is quite flexible.
+<p>
+This renderer was developed at the 
+<A HREF="http://www.psc.edu/">Pittsburgh Supercomputing Center</A>
+with major support from the 
+<A HREF="http://zeus.ncsa.uiuc.edu:8080/GC3_Home_Page.html"> Grand
+Challenge Cosmology Consortium (GC3)</A>.  This document describes 
+version 1.0 of the software.
+
+<H2><A NAME="tcland">Tcl and StarSplatter</A></H2>
+
+<A HREF="http://www.sunlabs.com:80/research/tcl/">Tcl</A> is a widely
+used scripting language.  You may already be using it, in programs
+that use <em>tclsh</em> or in tools based on Tcl/Tk.  StarSplatter is
+almost exactly like <em>tclsh</em>, but it knows a few commands 
+<em>tclsh</em> doesn't- specifically, commands to render collections 
+of particles.
+<p>
+The usual way to run StarSplatter is to write a Tcl script, and then
+feed the script to the program.  The command line to do that might
+look like:
+<pre>
+starsplatter myscript.tcl
+</pre>
+The full set of command line options is:
+<pre>
+starsplatter [-V] [-C] [tclscript [arg1 arg2 ...]]
+</pre>
+The <kbd>-V</kbd> option prints version information, and the 
+<kbd>-C</kbd> option prints 
+copyright information.  <kbd>tclscript</kbd> is a script file name, and the 
+optional arguments are made available to Tcl as they would be in
+<em>tclsh</em>.
+<p>
+Alternately, StarSplatter can be run interactively.  For example:
+<pre>
+starsplatter
+starsplatter> puts "hello world"
+hello world   <em>(this line is output by the program)</em>
+starsplatter> exit
+</pre>
+In interactive mode, any Tcl command or StarSplatter rendering command
+is valid input.
+
+<h2><a name="startupscript">Start-up Resource File</a></h2>
+
+One nice thing about the way StarSplatter works with Tcl is that 
+it can load a startup file of Tcl commands.  
+If you have a resource file named <code>.ssplatrc</code>
+in your home directory, StarSplatter will load it automatically when
+it is started.  This will happen before it executes commands in any
+script given on its command line.  If you have Tcl subroutines you
+often use, or datasets you want to load every time you run StarSplatter,
+they can be defined or loaded in this file.  
+
+
+<h2><A NAME="quickstart">Quick Start</A></h2>
+
+Suppose you have a file called <em>sample.tipsy</em> which was written
+by the 
+<a href="http://hermes.astro.washington.edu/tools/TIPSY/">TIPSY</a> 
+<em>writebox</em> command.  To render that file and save
+the result as a tiff image in the file test.tiff, an appropriate Tcl
+script might be:
+<pre>
+set mycam [ ssplat create_camera ]
+$mycam from { 0.0 0.0 3.0 }
+$mycam hither 1.0
+$mycam yon 5.0
+set gas [ ssplat create_starbunch ]
+set stars [ ssplat create_starbunch ]
+set dark [ ssplat create_starbunch ]
+ssplat load_tipsy_box test.tipsy $gas $stars $dark
+$gas color { 1.0 0.0 0.0 }
+$gas density 1.0
+$gas scale_length 0.1
+$stars color { 0.0 1.0 0.0 }
+$stars density 1.0
+$stars scale_length 0.1
+$dark color { 0.0 0.0 1.0 }
+$dark density 0.1
+$dark scale_length 0.1
+set myren [ ssplat create_renderer ]
+$myren image_size 640 480
+$myren camera $mycam
+$myren debug on
+$myren exposure_rescale_type log
+$myren render test.tiff "$gas $stars $dark"
+</pre>
+
+<p>
+The first few lines define a camera named <var>mycam</var>, and set
+some of its characteristics- the point it looks from, the point it looks
+at, the orientation of the top of the image, and the near and far
+clipping distances.  This camera will use a perspective projection by
+default, though it could be set to use parallel projection if desired.
+<p>
+The second group of lines create groups of particles, called
+<def>starbunches</def>.  
+The command <br><kbd>ssplat load_tipsy_box</kbd> causes the 
+<a href="http://hermes.astro.washington.edu/tools/TIPSY/">TIPSY</a> 
+box dataset to be read into the starbunches provided.  This command 
+always takes bunches for gas, stars, and dark matter in that order.
+Positions, density information, and Gaussian scale lengths for the
+particles are loaded from the file.
+<p>
+The next set of commands sets properties of the particle bunches, 
+establishing a connection between the data read from the file and
+their appearance in the final image.  These values are generally selected
+by trial and error.  The <def>density</def> and <def>scale length</def> 
+values given for the bunches multiply the values for the individual 
+particles read from the TIPSY file;  they control the overall opacity 
+and size of the Gaussian splats produced when the particles are rendered.
+The <def>color</def> is just the color of the particles.  The components
+represent red, green, and blue intensity and opacity (if given).
+<p>
+The last group of commands creates a <def>renderer</def>, and then uses
+it to render a picture of the particles.  Several options for the renderer
+are set, including the image size.  Debugging is turned on because it
+produces output which is often useful when trying out new images.  The
+exposure type is set to be logarithmic, to improve the handling of 
+contrast between bright and dim parts of the image.
+The final command causes the image
+to be rendered.  The resulting image is stored as a 
+<A HREF= http://www.earthlink.net/~ritter/tiff/>TIFF</A> format
+file with the given filename.
+
+<h2><a name="theory">Theory</A></h2>
+
+The algorithms StarSplatter uses are pretty simple.  It knows about
+collections of particles called <def>starbunches</def>, which have
+properties like <def>position</def>, <def>color</def>, <def>density</def>, 
+and <def>scale length</def>.  The scale length provides a length scale
+for the exponential decay of a particle's effect on the final image;
+it can also be set in terms of of an <def>exponent constant</def>.
+All particles in a bunch must share a color, 
+but the other properties differ from particle to particle.
+<p>
+Obviously each particle has its own unique position.  Density and scale
+length can be assigned to individual particles, or fixed values can be
+given for the entire bunch.  If both individual and bunch values are
+assigned, they multiply, so that density and scale length values read
+from a data file can be scaled to produce a more pleasing image.
+<p>
+Each particle is drawn as a Gaussian <def>splat</def> in the final image;  
+the position, color, opacity, and size of the splat are controlled by the
+particle and bunch properties.  The shape and opacity of each splat is 
+proportional to the expression 
+<var>d</var>*exp( -<var>k</var>*<var>r</var>*<var>r</var> ), 
+where the exponent base
+is <em>e</em>, <var>d</var> is the density, 
+<var>k</var> is the exponential decay constant, and <var>r</var>
+is the radial distance in world space away from the line of sight (a 2D
+rather than 3D distance).  <var>k</var> is related to the scale length
+<var>l</var> as follows: <var>k</var> = 1.0/ (<var>l</var>*<var>l</var>) .
+These scale lengths can be thought of as being related to the gravitational
+softening length or smoothing length of particles used in astrophysics
+codes.
+<p>
+A <def>camera</def> is used to define a viewpoint for looking at these
+particles.  The camera has a few properties of its own, like its location
+and the point it looks at.  These properties are described below in the
+section on camera commands, and are all pretty intuitive.  By default,
+cameras render images with perspective projections.  Things seen with
+telescopes actually are seen in parallel projection because of their
+great distance, but perspective projection provides a greater sense of
+depth and so may be useful for viewing computational data.  It is easy
+to set a camera to use parallel projection.  <b>Note:</b> One 
+important difference
+between parallel and perspective projection is that objects do not
+get smaller and dimmer with distance in parallel projection.  To get
+the appearance of parallel projection with objects that still dim
+with distance, use perspective projection with a small <def>fovea</def>
+angle.
+<p>
+A <def>renderer</def> is a special type of object within StarSplatter.
+Renderers are used to turn all this camera and particle information into
+final images.  In general only one is needed, but in principle more
+than one renderer is possible.  
+<p>
+When a renderer produces an image from a collection of particles, it uses
+the following steps.  First, information from the camera is used to figure
+out where each particle should appear in the image.  The particles are
+then sorted by distance, and each is drawn in turn going from back to
+front.
+<p>
+When it is time for a particle to be drawn, the program figures out
+the size and placement of its splat and adds the splat to the image.
+If all the splats in each bunch have the same density and scale
+length, certain short cuts are possible which make this process about
+20% faster.  Depending on the size of the splat in the image, it may
+be drawn so that its Gaussian profile is visible, or it may be drawn
+as a point of properly scaled brightness.  If debugging output is
+turned on, the renderer will print a message every ten thousand splats
+to show that it is making progress through this step.
+<p>
+The result of this process is a sort of raw image made up of floating
+point numbers, rather like the latent image on an undeveloped piece of
+film.  The final step in the rendering process converts that image into
+a final image.  The trick here is to produce an image in which dim
+details appear, but where bright details are not over-exposed.
+A StarSplatter renderer provides several controls for this.  The simplest
+is the <def>exposure</def> variable, which scales the whole image intensity
+up or down.  This is analogous to changing the exposure time of a 
+film image.  Other variables within StarSplatter can achieve the same
+effect, but it may be convenient to do it this way.  
+<p>
+The user can also control the mapping function used to go from raw image
+to final image using the renderer's <def>exposure rescale type</def>.  This
+can be <em>linear</em>, <em>logarithmic</em>, or <em>logarithmic with
+auto-scaling</em>.  The linear map is just that.  The logarithmic maps
+use a function of the form:
+<pre> 
+       log(<var>c</var>)-log(<var>c<sub>min</sub></var>)
+      _________________
+ 
+      log(c<sub>max</sub>)/log(c<sub>min</sub>)
+
+</pre>
+where log() denotes the natural logarithm, <var>c</var> is a color
+intensity, and <var>c<sub>max</sub></var> and 
+<var>c<sub>min</sub></var>
+are specific minimum and maximum values.  The transparency information in
+the image is also saved, in case it is needed later for some compositing
+operation.
+<p>
+In logarithmic rescaling mode, the user explicitly sets 
+<var>c<sub>min</sub></var> and <var>c<sub>max</sub></var> using the
+renderer's log_rescale_bounds command.  In auto-scaled logarithmic mode,
+the renderer tries to pick values.  Sometimes the results are good, but
+under some circumstances the renderer will pick values which are not
+ideal;  in particular it often guesses too low for <var>c<sub>min</sub></var>.
+StarSplatter prints out the values it picks in this mode, so it may be
+reasonable to use auto-scaling originally and then modify the values.
+<b>Note:</b> If you are doing an animation, you may want to avoid auto-scaling,
+because the exposure levels will change as the renderer adjusts itself for
+each new frame.  If debugging output is turned on, histograms of the
+exposure levels are printed out as an aid to picking good rescaling
+values.
+
+<h2><a name="commands">Commands</A></h2>
+
+<p>
+StarSplatter follows an <em>object oriented</em> approach to Tcl command
+structure.  The user creates objects of particular types, and then uses
+the objects to carry out tasks.  StarSplatter knows about <def>camera</def>,
+<def>starbunch</def>, and <def>renderer</def> objects.  
+<p>
+In addition to commands to manipulate these objects, there are a small
+number of utility commands for tasks like reading in datasets.
+<p>
+
+<h3><a name="camcom">Camera Commands</a></h3>
+<dl>
+<dt><b>ssplat create_camera</b>
+<dd>
+This command creates a camera object.  A typical usage might be:
+<br>
+<code>
+set camera [ ssplat create_camera ]
+</code>
+<br>
+The effect of this command is to create a variable, <kbd>$camera</kbd>,
+containing a camera object.
+<dt><b>$<var>camera</var> delete</b>
+<dd>This command deletes the camera <var>camera</var>, causing
+Tcl to forget about it completely.
+<dt><b>$<var>camera</var> dump</b>
+<dd>This command causes a text description of the camera <var>camera</var>
+to be written to stdout.
+<dt><b>$<var>camera</var> from { <var>x</var> <var>y</var> <var>z</var> }</b>
+<dd>This command sets the camera to look from the given
+point.
+<dt><b>$<var>camera</var> at { <var>x</var> <var>y</var> <var>z</var> }</b>
+<dd>This command sets the camera to look at the given
+point.
+<dt><b>$<var>camera</var> up { <var>x</var> <var>y</var> <var>z</var> }</b>
+<dd>This command sets the camera's up vector to the
+given value.  This coordinate direction will be toward the top of the
+image in views rendered with this camera.  Only the component of this
+vector which is perpendicular to the line of sight matters;  it is an
+error to define an up direction which lies parallel to the line of sight.
+<dt><b>$<var>camera</var> fovea <var>angle</var></b>
+<dd>This command sets the opening angle of the given camera to the value
+given.  This angle will span the smaller of the image height or width in
+images rendered with this camera.
+<dt><b>$<var>camera</var> hither <var>distance</var></b>
+<dd>This command sets the near clipping plane distance to the value given.
+<var>distance</var> should be a positive number less than the yon distance 
+(see below).
+<dt><b>$<var>camera</var> yon <var>distance</var></b>
+<dd>This command sets the far clipping plane distance to the value given.
+<var>distance</var> should be a positive number greater than the hither
+distance (see above).
+<dt><b>$<var>camera</var> projection [ perspective | parallel ]</b>
+<dd>This command sets the camera projection type.  The two options produce
+perspective (the default) and parallel projection respectively.  In parallel
+projection, the view size is chosen based on the fovea angle and view 
+distance, but parallel lines do not converge at infinity.  This means
+that splat sizes do not shrink with distance, and hence that objects
+do not dim with distance.
+<dt><b>$<var>camera</var> get [ from | at | up | fovea | hither | yon | projection ]</b>
+<dd>This command causes the given camera to return the given value, as 
+a Tcl return value.  This value might then be printed or used to set a
+similar value in a different camera.  A typical usage might be:
+<br><code>$camera2 at [ $camera1 get at ]</code><br>
+The effect of this command would be to copy the at point of <var>camera1</var>
+into </var>camera2</var>.
+</dl>
+
+
+<h3><a name="starbunchcom">Starbunch commands</a></h3>
+
+<def>Starbunch</def> objects represent collections of particles.  
+(Yes, I know I
+should have called them particlebunches, but I opted to save a few syllables).
+All particles exist in one and only one starbunch.  Typically a few
+starbunches will be created, and then a utility command will be used to
+load particles into them.  These particles can then be rendered.
+
+<dl>
+
+<dt><b>ssplat create_starbunch</b>
+<dd>This command creates a starbunch object.  A typical usage might be:
+<br><code>set bunch [ ssplat create_starbunch ]</code><br>
+The effect of this command is to create a variable, <kbd>$bunch</kbd>,
+containing an empty collection of particles.
+
+<dt><b>$<var>bunch</var> delete</b>
+<dd>This command deletes the starbunch <var>bunch</var>, causing Tcl
+to forget about it completely.
+
+<dt><b>$<var>bunch</var> dump</b>
+<dd>This command causes a text description of the starbunch <var>bunch</var>
+to be written to stdout.
+
+<dt><b>$<var>bunch</var> fulldump</b>
+<dd>This command causes a complete text description of the starbunch 
+<var>bunch</var> to be written to stdout.  This dump includes 
+<strong>all particle coordinates</strong>, so for a large bunch it
+can be very time- consuming.
+
+<dt><b>$<var>bunch</var> nstars <var>number</var></b>
+<dd>This command sets the number of particles the given starbunch can hold
+to the value given.  If that number differs from the current number,
+all particles currently loaded are forgotten.
+
+<dt><b>$<var>bunch</var> nprops <var>number</var></b>
+<dd>This command sets the number of properties associated with the starbunch
+to the value given.
+
+<dt><b>$<var>bunch</var> time <var>value</var></b>
+<dd>This command sets the time the starbunch's coordinates are considered
+valid to the given value.  (This value will eventually be used to implement
+motion blur).
+
+<dt><b>$<var>bunch</var> density <var>value</var></b>
+<dd>This command sets the color density of the starbunch's particles to the
+given value.  Lower values cause the splats produced by these particles to
+be more transparent.  Typical values are less than (1/<var>k</var>) where
+<var>k</var> is the exponential decay constant (see below).  If the 
+particles in the bunch have individual densities, this value multiplies 
+them.
+
+<dt><b>$<var>bunch</var> particle_density <var>istar</var> <var>value</var></b>
+<dd>This command sets the density of the <var>istar</var>'th particle to
+the value given.  Particle densities have a default value of 1.0.  This
+value multiplies the overall bunch density value.
+
+<dt><b>$<var>bunch</var> exponent_constant <var>value</var></b>
+<dd>This command sets the exponential decay constant for the particles in
+the given starbunch.  The splat density profile has a shape proportional
+to exp( -<var>k</var>*<var>r</var>*<var>r</var> ), where the exponent base
+is <em>e</em>, <var>k</var> is the exponential decay constant, and <var>r</var>
+is the radial distance in world space away from the line of sight (a 2D
+rather than 3D distance).  Setting the <kbd>scale_length</kbd> (see below) 
+changes this value.  If the particles in the bunch have individual
+exponent constants, this value multiplies them.
+
+<dt><b>$<var>bunch</var> particle_exponent_constant <var>istar</var></b>
+<var>value</var>
+<dd>This command sets the exponent constant of the <var>istar</var>'th
+particle to the value given.  Particle exponent constants have a
+default value of 1.0.  This value multiplies the overall bunch
+exponent constant.  Setting a particle's <kbd>particle_exponent_constant</kbd>
+changes
+the particle's <kbd>particle_scale_length</var>, and vice versa.
+
+<dt><b>$<var>bunch</var> scale_length <var>value</var></b>
+<dd>This command sets the exponential decay constant for the particles in
+the given starbunch;  it is functionally equivalent to using the 
+exponent_constant command (see above).  The two values are related
+as follows: <var>k</var> = 1.0/ (<var>l</var>*<var>l</var>), where
+<var>k</var> is the exponential decay constant described above and
+<var>l</var> is the scale length.  Setting the <kbd>exponent_constant</kbd> 
+changes this value.  If the particles in the bunch have individual
+scale lengths, this value multiplies them.
+
+<dt><b>$<var>bunch</var> particle_scale_length <var>istar</var></b>
+<var>value</var>
+<dd>This command sets the scale length of the <var>istar</var>'th
+particle to the value given.  Particle scale lengths have a
+default value of 1.0.  This value multiplies the overall bunch
+scale length.  Setting a particle's <kbd>particle_exponent_constant</kbd>
+changes
+the particle's <kbd>particle_scale_length</var>, and vice versa.
+
+<dt><b>$<var>bunch</var> color { <var>red</var> <var>green</var> <var>blue</var> <var>opacity</var> }</b>
+<dd>This command sets the color of the particles in the given starbunch to
+the given value.  <var>opacity</var> may be omitted, in which case it
+defaults to 1.0.  Colors for which the <var>red</var>, <var>green</var>,
+or <var>blue</var> values exceed the <var>opacity</var> produce a luminous
+appearance.
+
+<dt><b>$<var>bunch</var> coords <var>istar</var> { <var>x</var> <var>y</var> <var>z</var> }</b>
+<dd>This command sets the coordinates of the <var>istar</var>'th particle
+in the starbunch to the value given.  <var>istar</var> counts from 0,
+so the largest valid particle number is nstars - 1.
+
+<dt><b>$<var>bunch</var> get [ nstars | time | density | exponent_constant |
+scale_length | color ]</b>
+<dd>This command causes the given starbunch to return the given value, as
+a Tcl return value.  This value might then be printed or used to set a
+corresponding value in a different starbunch.  For example, the command:
+<br><code>puts [$stars get density]</code><br>
+would cause the overall density of the bunch to be printed.
+
+<dt><b>$<var>bunch</var> get [ coords | particle_density |
+particle_exponent_constant <br>| particle_scale_length ] <var>istar</var></b>
+<dd>This command causes the given starbunch to return the given value, as
+a Tcl return value.  This value might then be printed or used to set a
+corresponding value in a different starbunch.  The particle index given
+counts from 0, so the command:
+<br><code>puts [$stars get coords 3]</code><br>
+would cause the coordinates of the <em>fourth</em> particle to be printed.
+</dl>
+
+<h3><a name="rencom">Renderer Commands</a></h3>
+<p>
+A <def>renderer</def> is the object type which actually produces an image
+from particle data.  Typically an application needs only one, but they are
+handled in an object oriented way for uniformity of the interface.
+<p>
+<dl>
+
+<dt><b>ssplat create_renderer</b>
+<dd>This command creates a renderer object.  A typical usage might be:
+<br><code>set renderer [ ssplat create_renderer ]</code><br>
+The effect of this command is to create a variable, <kbd>$renderer</kbd>,
+containing a renderer.
+
+<dt><b>$<var>renderer</var> delete</b>
+<dd>This command deletes the renderer <var>renderer</var>, causing Tcl
+to forget about it completely.
+
+<dt><b>$<var>renderer</var> dump</b>
+<dd>This command causes a text description of the renderer <var>renderer</var>
+to be written to stdout.
+
+<dt><b>$<var>renderer</var> image_size <var>width</var> <var>height</var></b>
+<dd>This command sets the given renderer to produce an image of the given
+size.  For example, for video images <var>width</var> and <var>height</var>
+might be 640 and 480 respectively.
+
+<dt><b>$<var>renderer</var> camera <var>thiscam</var></b>
+<dd>This command sets the camera used by the given renderer to be a copy
+of the camera given.  Note that the camera is copied to the renderer;  changes
+made later to <var>thiscam</var> do not effect the renderer or its output.
+
+<dt><b>$<var>renderer</var> debug <var>flag</var></b>
+<dd>This command turns debugging output on or off for the given renderer.
+This can be useful in that debugging output will give a running description
+of the rendering process.  Valid <var>flag</var> variables are Tcl booleans,
+for example 0, 1, "on", "off", "true", or "false".
+
+<dt><b>$<var>renderer</var> exposure <var>value</var></b>
+<dd>This command sets the "exposure time".  For a given image, higher values
+cause the image to brighten;  lower values can reduce over-exposure.  The
+default value is 1.0 .
+
+<dt><b>$<var>renderer</var> exposure_rescale_type [ linear | log | log_auto ]</b>
+<dd>This command causes the image exposure to be rescaled according to one 
+of the given rules- <kbd>linear</kbd> for linear scaling, <kbd>log</kbd>
+for log scaling, and <kbd>log_auto</kbd> for log rescaling in which the
+system tries to pick appropriate min and max values.  The values set by
+the renderer <kbd>log_rescale_bounds</kbd> command below have no effect
+unless <kbd>exposure_rescale_type</kbd> is set to false.  The default
+setting is <kbd>linear</kbd>.
+
+<dt><b>$<var>renderer</var> log_rescale_bounds <var>min</var> <var>max</var></b>
+<dd>This command sets the minimum and maximum values used in log exposure
+rescaling.  This command has no effect unless the renderer's 
+<kbd>exposure_rescale_type</kbd> is set to <kbd>log</kbd>.  The default
+minimum and maximum values are 0.001 and 1.0 respectively.
+
+<dt><b>$<var>renderer</var> splat_cutoff <var>value</var></b>
+<dd>This command can be used to reset the splat cutoff value, which specifies
+the fraction of peak intensity below which the splat is ignored.  Each splat
+is actually drawn as a square area;  this value sets the brightness at the
+edge of the square.  The default value, 0.01, seldom has to be changed.
+
+<dt><b>$<var>renderer</var> force_slow_splat_method <var>flag</var></b>
+<dd>This flag can be set to force the renderer to use the
+slow, simple algorithm in the routine StarSplatter::slow_splat() to
+draw particle splats.  This might be useful if the user has
+modified that routine to change the splat shape;  otherwise the 
+accelerated splatting routine might be used, bypassing the user's
+modification.  Valid <var>flag</var> variables are Tcl booleans,
+for example 0, 1, "on", "off", "true", or "false".  The default is 
+"false".
+
+<dt><b>$<var>renderer</var> rotate <var>angle</var> { <var>axis_x</var> <var>axis_y</var> <var>axis_z</var> }</b>
+<dd>This command rotates the collection of particles about the given 
+<var>axis</var> (in the world coordinate system) by the given <var>angle</var>
+(in degrees).  Successive rotations are cumulative.
+
+<dt><b>$<var>renderer</var> orient <var>angle</var> { <var>axis_x</var> <var>axis_y</var> <var>axis_z</var> }</b>
+<dd>This command sets the orientation of the collection of particles to be
+a rotation about <var>axis</var> (in the world coordinate system) by the 
+given <var>angle</var> (in degrees).  Successive calls are not cumulative;
+each resets the orientation to the given values.
+
+<dt><b>$<var>renderer</var> render <var>filename</var> <var>bunchlist</var></b>
+<dd>This command causes the starbunches in the given <var>bunchlist</var> to
+be rendered, and the results to be stored as a 
+<A HREF= http://www.earthlink.net/~ritter/tiff/>TIFF</A> file with the 
+given <var>filename</var>.  Typical usage might be:
+<br><code>$ren render output.tiff "$gas $stars $darkmatter"</code><br>
+All the particles in the given starbunches would be rendered with
+the current parameters.
+
+<dt><b>$<var>renderer</var> render_points <var>filename</var> <var>bunchlist</var></b>
+<dd>This command causes the starbunches in the given <var>bunchlist</var> to
+be rendered as simple colored points, and the results to be stored as a 
+<A HREF= http://www.earthlink.net/~ritter/tiff/>TIFF</A> file with the 
+given <var>filename</var>.  The command is functionally much like the
+<kbd>render</kbd> command above, but much faster.  It is useful for selecting
+viewpoints and setting up for slower renders.
+
+<dt><b>$<var>renderer</var> get [ xsize | ysize | camera_set_flag | camera | debug | exposure_rescale_type | log_rescale_min | log_rescale_max | splat_cutoff | exposure | force_slow_splat_method ]</b>
+<dd>This command causes the given renderer to return the given value, as
+a Tcl return value.  This value might then be printed or used to set a
+corresponding value in a different renderer.  A typical usage might be:
+<br><code>puts [ $ren get exposure ]</code></br>
+<kbd>camera_set_flag</kbd>, <kbd>debug</kbd>, and 
+<kbd>force_slow_splat_method</kbd> return Tcl boolean values.
+<kbd>exposure_rescale_type</kbd> returns "linear", "log", or "log_auto"
+as appropriate.
+<kbd>camera</kbd> returns the current camera.  For example, to see the
+details of the current camera one might use the command:
+<br><kbd>[ $ren get camera ] dump</kbd></br>
+</dl>
+
+
+<h3><a name="utilcom">Utility Commands</a></h3>
+
+The following utility commands are supported.
+
+<dl>
+<dt><b>ssplat load $<var>file</var> [ binary | ascii ] [ xyzxyz | xyzdkxyzdk ]
+<var>list_of_bunches</var> <br>
+[ -skiplines <var>n</var> | -skipbytes <var>n</var> ]</b>
+<dd>This command loads general particle data files.  The entire command
+must appear on one line.  <var>file</var> is a Tcl file variable, as
+returned by the Tcl <kbd>open</kbd> command.  The fourth keyword specifies
+if the file is in native binary or ascii format;  the fifth specifies 
+if the file consists of a series of X-Y-Z triples (<kbd>xyzxyz</kbd>) or
+a series of X-Y-Z-density-exponent constant 5-ples 
+(<kbd>xyzdkxyzdk</kbd>).  The <kbd>-skiplines</kbd> and <kbd>-skipbytes</kbd>
+arguments are optional, but can be used to skip header lines or bytes
+respectively.  Note that <kbd>-skiplines</kbd> still works in binary mode,
+skipping up to the next end-of-line in the binary stream (up to a certain
+maximum line length).  Because of the way Tcl manipulates files, this
+command can't be mixed with loading other data (like particle counts)
+from the file in a Tcl script;  the file must be closed and reopened
+to change between Tcl reading and reading with this command.  Typical
+usage might be:<br>
+<code>ssplat load $myfile binary xyzxyz "$gas $dust $stars" -skipbytes 12</code>
+
+<dt><b>ssplat load_tipsy_box <var>filename</var> <var>gas</var> <var>stars</var> <var>dark</var></b>
+<dd>This command loads particle data from ascii files of the format written
+by the 
+<a href="http://hermes.astro.washington.edu/tools/TIPSY/">TIPSY</a> 
+<em>writebox</em> command.  These files always contain data for gas,
+stars, and dark matter;  starbunches must be provided for all three in 
+that order.  Typical usage would be:
+<br><code>ssplat load_tipsy_box sample.tipsy $gas $stars $dark</code><br>
+StarSplatter loads coordinate and mass information from the file,
+using the mass data to set densities for each particle.  The gravitational
+softening lengths and SPH smoothing lengths from the file are used to
+set the scale lengths for the dark matter, stars, and gas.  Other information
+in the file is ignored.
+
+<dt><b>ssplat load_dubinski <var>filename</var> <var>bunchlist</var></b>
+<dd>This command loads particle data from ascii files in John Dubinski's
+format.  That format can contain an arbitrary number of particle groups,
+so the user must know how many groups are in the given file before using
+this command.  <var>bunchlist</var> contains a list of previously created
+starbunches.  It is an error to provide fewer starbunches than there are
+groups in the file;  extra starbunches for which there are no corresponding
+groups are made empty.  Typical usage would be:
+<br><code>ssplat load_dubinski infile.dubinski "$group1 $group2 $group3 $group4"</code><br>
+This function returns the number of groups actually loaded as its Tcl return
+value.
+
+<dt><b>ssplat load_dubinski_binary <var>filename</var> <var>bunchlist</var></b>
+<dd>As for <kbd>load_dubinski</var> above, but the data file is assumed to be
+in native binary format.
+</dl>
+
+<h2><a name="examples">Examples</A></h2>
+<p>
+The following example script reads a dataset in Tipsy format.  120 views
+of the dataset are then rendered, rotating by 3 degrees about the Y axis
+for each new view.  The camera defaults to looking at the origin.
+<p>
+<pre>
+set mycam [ ssplat create_camera ]
+$mycam from { 0.0 0.0 3.0 }
+$mycam hither 1.0
+$mycam yon 5.0
+set gas [ ssplat create_starbunch ]
+set stars [ ssplat create_starbunch ]
+set dark [ ssplat create_starbunch ]
+ssplat load_tipsy_box test.tipsy $gas $stars $dark
+set myren [ ssplat create_renderer ]
+$myren image_size 320 240
+$myren camera $mycam
+$gas color { 1.0 0.0 0.0 }
+$gas density 0.0003
+$gas exponent_constant 3000.0
+$stars color { 0.0 1.0 0.0 }
+$stars density 0.0003
+$stars exponent_constant 3000.0
+$dark color { 0.0 0.0 1.0 }
+$dark density 0.0003
+$dark exponent_constant 3000.0
+set i 0
+while { $i < 120 } {
+    set fname [ format "frame_%04d.tiff" $i ]
+    $myren render $fname "$gas $stars $dark"
+    $myren rotate 3.0 { 0.0 1.0 0.0 }
+    puts "$i finished"
+    incr i 1
+}
+</pre>
+<p>
+The following script reads a series 100 of datasets in John Dubinski's format,
+rendering each.  Each new load deletes the particles loaded in the previous
+step.  The <kbd>puts</kbd> command on the load line causes the number of
+particle groups loaded to be printed.
+<pre>
+set mycam [ ssplat create_camera ]
+$mycam from {-5.0 -9.0 3.0}
+$mycam up {0.0 0.0 1.0}
+$mycam hither 1.0
+$mycam yon 50.0
+$mycam fovea 35.0
+set disk1 [ ssplat create_starbunch ]
+set disk2 [ ssplat create_starbunch ]
+set bulge1 [ ssplat create_starbunch ]
+set bulge2 [ ssplat create_starbunch ]
+set myren [ ssplat create_renderer ]
+$myren image_size 640 480
+$myren camera $mycam
+$myren exposure_rescale_type log
+$myren exposure 0.5
+$myren debug on
+$disk1 color { 0.8 0.5 1.0 0.1}
+$disk1 density 0.0001
+$disk1 exponent_constant 1000.0
+$disk2 color { 0.5 0.8 0.0 0.1}
+$disk2 density 0.0001
+$disk2 exponent_constant 1000.0
+$bulge1 color { 0.8 0.7 0.5 0.1}
+$bulge1 density 0.00003
+$bulge1 exponent_constant 1000.0
+$bulge2 color { 0.8 0.7 0.5 0.1}
+$bulge2 density 0.00003
+$bulge2 exponent_constant 1000.0
+set i 0
+while { $i < 100 } {
+    set input_fname [ format "coords_%04d.dat" $i ]
+    set image_fname [ format "frame_%04d.tiff" $i ]
+    puts [ ssplat load_dubinski $input_fname "$disk1 $disk2 $bulge1 $bulge2" ] 
+    $myren render $image_fname "$gas $stars $dark"
+    puts "$i finished"
+    incr i 1
+}
+</pre>
+
+<h2><a name="tips">Operating Tips and Tricks</a></h2>
+<dl>
+
+<dt><b>Point splatting is a fast way to find good camera info.</b>
+<dd>If you are dealing with a large dataset, rendering test images
+can be unpleasantly slow.  The renderer's <kbd>render_points</kbd>
+command can make a quick rendering which will give you viewpoint
+information.
+
+<dt><b>Slow rendering time may mean oversized splats.</b>
+<dd>If rendering of your particles seems to be going very slowly,
+it may be because the splats being generated are too large.  This can
+be checked by turning on debugging in the renderer and looking at the
+statistics on splat sizes it will generate.  Splats need to overlap
+to produce a smooth image, but very large splats will needlessly
+blur things.  Splat size is adjusted the particle scale lengths.
+A larger image will require larger splats, but this cannot be helped.
+For video resolution images, splats typically involve 30 or fewer
+pixels.
+
+<dt><b>Square, flat splats mean bad rescaling parameters.</b>
+<dd>If your image has large, squarish, constant-color splats rather than
+nice round Gaussian splats, the problem may be that the log rescaling
+parameters being used are not good.  If you are using log auto scaling,
+see below.
+
+<dt><b>Automatic log rescaling may give poor results.</b>
+<dd>If you try rendering an image with image rescaling set to "auto
+log" mode and the results are poor, read the values the scaling
+has picked (they will be written to the output), and try setting
+explicit values in the same neighborhood.  One common error is that
+the lower bound is chosen too low.
+
+<dt><b>Setting up for animations.</b>
+<dd>If you are setting up to do an animation or other series of similar
+renders, try a few sample frames first.  If you try these frames with
+renderer debugging on, you will get an idea of the exposure rescaling
+and splat size statistics your animation will produce.  This can avoid
+time-consuming errors.  To set log exposure parameters, try sample frames
+with log auto rescaling on and use the values produced to help pick
+range values for your whole animation.  Remember to turn log auto
+exposure scaling off before starting your animation, so that the exposure
+parameters don't change from frame to frame.
+
+<dt><b>Applying your own color maps.</b>
+<dd>StarSplatter assumes a color model in which different particle types
+have different colors.  Another scheme which can produce very nice images
+is to do a gray scale rendering (by making all the particle colors white),
+and then applying a color map to the resulting tiff image file.  A variety
+of tools can be used to apply the color map, for example the free 
+<a href="http://www.vex.net/~smarry/netpbm.html">NETPBM</a> utilities.
+
+</dl>
+
+<h2><a name="knownbugs">Known Bugs and Work-Arounds</a></h2>
+
+<dl>
+<dt><b>Off-Screen Splat Clipping Bug</b>
+<dd>If a particle is off-screen but its splat extends into the image,
+the particle is inappropriately clipped.  This results in a dimmed region
+near the borders of the image.  The work-around is to render a larger image
+than needed (with a larger fovea as well), and clip the image down to
+the desired size.  This behavior is a speed tradeoff.
+<dt><b>Small Angle Approximation Bug</b>
+<dd>The small angle approximation is used to calculate splat sizes.  If the
+splat is close to the viewpoint this approximation breaks down and the image
+becomes inaccurate.  A work-around is to use a smaller fovea rather than
+moving the viewpoint right up to the particles.  This behavior is a speed
+tradeoff.
+<dt><b>Things Don't Grow Dimmer with Distance in Parallel Projection</b>
+<dd>This isn't a bug, it's a feature.  A work-around is to use perspective
+projection with a small fovea angle.  The angle can't be too small,
+or numerical errors will arise, but 1 degree will give some dimming with
+distance and yet be visually indistinguishable from parallel projection.
+</dl>
+
+
+<h2><a name="fileformats">File Formats</a></h2><p>
+
+<h3><a name="tipsywritebox">TIPSY Writebox Format</A></h3>
+
+The following description of the 
+<a href="http://hermes.astro.washington.edu/tools/TIPSY/">TIPSY</a> 
+<em>writebox</em> format is from the man page for the TIPSY 
+<em>readascii</em> command:
+<pre>
+     Each time frame should be of the form:
+
+          ntotal, ngas, nstar
+
+          ndimensions
+
+          time
+
+          mass(i), i = 1 to ntotal
+
+          x_position(i), i = 1 to ntotal
+
+          y_position(i), i = 1 to ntotal
+
+          z_position(i), i = 1 to ntotal
+
+          x_velocity(i), i = 1 to ntotal
+
+          y_velocity(i), i = 1 to ntotal
+
+          z_velocity(i), i = 1 to ntotal
+
+          grav_softening_length_dark_particles(i), i = 1 to ndark
+
+          grav_softening_length_star_particles(i), i = 1 to nstar
+
+          density(i), i = 1 to ngas
+
+          temperature(i), i = 1 to ngas
+
+          sph_smoothing_length(i), i = 1 to ngas,
+
+          metals_gas(i), i = 1 to ngas,
+
+          metals_star(i), i = 1 to nstar,
+
+          formation_time(i), i = 1 to nstar,
+
+          potential_energy(i), i = 1 to ntotal,
+
+     where ntotal is the total number of particles, ngas  is  the
+     number  of gas particles, ndark is the number of dark matter
+     particles, and nstar is the number of star  particles.   The
+     first  ngas  particles  should  be the gas particles and the
+     last nstar particles should be the star particles  with  the
+     dark  particles  being  in the middle.  Therefore, each time
+     frame should contain 9*ntotal+3*ngas+2nstar +3 lines.
+</pre>
+<p>
+The StarSplatter <kbd>ssplat load_tipsy_box</kbd> reads the coordinate,
+mass, star and dark matter softening length, and gas SPH smoothing length
+information from these files.  Velocity, gas density, temperature,
+and data following the SPH smoothing length are ignored.  It is generally
+necessary to modify the starbunch overall density and scale length
+values to produce good images from this data.
+<p>
+<h3><a name="dubinskiformat">Dubinski Format</A></h3>
+<p>
+These files can be either ascii or binary.  In either case, the 
+format is as follows:
+<pre>
+nbodies ngroups time
+istart1 iend1 mass1
+istart2 iend2 mass2
+.
+.
+.
+x y z
+x y z
+etc.
+</pre>
+The n'th istart value is one greater than the (n-1)'th iend value;  the
+first istart value is 1.  The number of particles in a group is 
+<nobr>(iend +1 - istart)</nobr>.  mass is a floating point value, as
+are the coordinates.
+<p>
+In binary format, <kbd>nbodies</kbd>, <kbd>ngroups</kbd>, and start and
+end integers are native ints, while <kbd>time</kbd>, masses, and 
+coordinates are native floats.  The file is assumed to have no record
+structure, as if written from the C language.
+
+<h3><a name="generalformat">General Format</a></h3>
+It is common to load data into StarSplatter by converting it from some
+other format with a conversion program (possibly run from the same Tcl script
+controlling StarSplatter) to a general coordinate format, and then
+reading that data with the <kbd>ssplat load</kbd> command.  The input
+to that command can be either ascii or native binary.  It must contain
+either consecutive triples of X-Y-Z coordinates as floating point
+numbers (<kbd>xyzxyz</kbd> format) or consecutive 5-ples of X-Y-Z
+coordinate information followed by particle density and particle
+exponent constant data in that order (<kbd>xyzdkxyzdk</kbd> format).  
+The file must contain enough data to fill all the
+starbunches provided to the command.  In binary mode, the data is
+given as native floating point values, and the file has no record
+structure, as for a file written from the C language.  Because of
+the way Tcl handles files, all the data in the file must be read
+at once;  consecutive <kbd>ssplat load</kbd> commands to the same
+file will not work properly.
+<p>
+
+<h2><a name="codemods">Modifying StarSplatter</a></h2>
+Three parts of StarSplatter which a user might wish to modify are the
+utilities that load data files, the function that rescales the exposure
+of an image, and the splatting algorithm itself.  If one has access to
+a C++ compiler, it is very reasonable to modify and recompile the code
+to make these changes.
+<p>
+It is possible to load new file formats by writing Tcl code.  If this
+proves too slow, the routines that load the Dubinski and TIPSY formats
+are in the file <kbd>utils.cc</kbd>.
+<p>
+The method StarSplatter::convert_image() is responsible for rescaling
+the exposure of images.  This code is in <kbd>ssplat_usr_modify.cc</kbd>.
+<p>
+To change the algorithm by which splats are drawn, modify the method
+StarSplatter::slow_splat() in <kbd>starsplatter.cc</kbd> and be sure
+to set the renderer's <var>force_slow_splat_method</var> flag to true.
+I do not recommend modifying the accelerated splatting routine.
+<p>
+
+      <hr>
+      <address><a href="mailto:welling@psc.edu">J. Welling</a></address>
+<!-- Created: Fri Sep  6 17:26:24 EDT 1996 -->
+<!-- hhmts start -->
+Last modified: Mon Jul 25 18:42:08 EDT 2005
+<!-- hhmts end -->
+  </body>
+</html>
+
+

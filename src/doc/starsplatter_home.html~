@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>StarSplatter Home Page</title>
+  </head>
+
+  <body>
+
+      <center><h1><font size=+4>StarSplatter</font> Home Page</h1></center>
+
+
+<a href="big_merger_4.jpg">
+<img src="big_merger_4_small.jpg" alt="picture of galaxies colliding" 
+align=left height= 256 width=256 hspace=30>
+</a>
+
+<br>
+<font size=-1>(Galaxy merger image by Joel Welling and John Dubinski)</font>
+
+<p>
+StarSplatter is a tool for creating images and animations from astrophysical
+particle simulation data.  It treats each particle as a Gaussian "blob",
+with an exponential fall-off similar to the SPH smoothing length or
+gravitational softening length common in astrophysics simulations.  It
+also properly anti-aliases points, so even if the particles are very small
+the results may look better than one would get by simply binning particle
+counts to produce an intensity image.
+<br clear=left>
+<p>
+
+StarSplatter runs under the control of the 
+<a href="http://sunscript.sun.com/">Tcl</a> scripting language 
+(see also <a href="http://www.neosoft.com/tcl/tclhtml/Tcl.html">here</a>).
+This allows it to be easily integrated with other programs;  it is also
+easy to set up scripts to render animations.  StarSplatter is designed
+to work with 
+<a href="http://hermes.astro.washington.edu/tools/TIPSY/">TIPSY</a>, a
+package for analyzing particle simulation data.
+<p>
+This software was developed at the 
+<a href="http://www.psc.edu/">Pittsburgh Supercomputing Center</a>
+in association with the 
+<a href= "http://zeus.ncsa.uiuc.edu:8080/GC3_Home_Page.html">Grand 
+Challenge Cosmology Consortium</a>.  
+Funding was provided by the 
+<a href="http://www.nsf.gov/">National Science Foundation</a>.
+<p>
+<ul>
+<li><a href="starsplatter_users_guide.html">StarSplatter User's Guide</a>
+<li><a href="ftp://ftp.psc.edu/pub/starsplatter">Download the Software</a>
+<li><a href="starsplatter_samples.html">Some sample images</a>
+</ul>
+
+<h2>Related Links</h2>
+<ul>
+
+<li><a href="http://research.amnh.org/~summers/">
+Frank Summers</a> has been using StarSplatter to produce images and
+animations of 
+<a href="http://research.amnh.org/~summers/starsplatter/starsplatter.html">
+starfields</a>, rather than of whole galaxies.  For example, he has
+some nice views of Orion and of stars known to have planetary systems.
+<li>Frank, <a href="http://burro.astr.cwru.edu/">Chris Mihos</a>
+and <a href="http://burro.astr.cwru.edu/maxwell/">Sean Maxwell</a>
+have used StarSplatter to generate animations of 
+<a href="http://research.amnh.org/~summers/mihos/mihos.html">
+galaxy mergers</a>.
+</ul>
+
+      <hr>
+      <address><a href="mailto:welling@seurat.psc.edu">J. Welling</a></address>
+<!-- Created: Wed May 28 13:04:12 EDT 1997 -->
+<!-- hhmts start -->
+Last modified: Fri Jan  7 14:03:33 EST 2000
+<!-- hhmts end -->
+  </body>
+</html>
