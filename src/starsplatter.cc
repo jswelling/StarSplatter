@@ -27,8 +27,6 @@
 #include "splinesplatpainter.h"
 #include "circlesplatpainter.h"
 
-static char rcsid[] = "$Id: starsplatter.cc,v 1.41 2009-06-09 23:46:51 welling Exp $";
-
 /* Notes-
  */
 

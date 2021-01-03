@@ -28,8 +28,6 @@ unsigned char* rgbImage::mem_block_hook= NULL;
 int rgbImage::mem_block_size= 0;
 #endif
 
-static char rcsid[] = "$Id: rgbimage.cc,v 1.13 2008-07-25 21:08:23 welling Exp $";
-
 #ifdef AVOID_IMTOOLS
 static ImVfb* ImVfbAlloc_private( const int xdim_in, const int ydim_in )
 {
@@ -80,37 +78,37 @@ static void ImVfbFree_private( ImVfb* buf )
 rgbImage::rgbImage( int xin, int yin, ImVfb *initial_buf )
 {
 
-    xdim= xin;
-    ydim= yin;
-    if (!initial_buf) {
+  xdim= xin;
+  ydim= yin;
+  if (!initial_buf) {
 #ifndef AVOID_IMTOOLS
-      buf= ImVfbAlloc( xdim, ydim, IMVFBRGB | IMVFBALPHA);
+    buf= ImVfbAlloc( xdim, ydim, IMVFBRGB | IMVFBALPHA);
 #else
-      buf= ImVfbAlloc_private( xdim, ydim );
+    buf= ImVfbAlloc_private( xdim, ydim );
 #ifdef CRAY_T3D
-      mem_block_hook= (unsigned char*)ImVfbQPtr(buf,0,0);
-      mem_block_size= (((4 * xin * yin) + 8191)/8192) * 8192;
+    mem_block_hook= (unsigned char*)ImVfbQPtr(buf,0,0);
+    mem_block_size= (((4 * xin * yin) + 8191)/8192) * 8192;
 #ifdef never
-char msgbuf[128];
-sprintf(msgbuf,"setting block size to %x=%d\n",mem_block_size,mem_block_size);
-fprintf(stderr,msgbuf);
+    char msgbuf[128];
+    sprintf(msgbuf,"setting block size to %x=%d\n",mem_block_size,mem_block_size);
+    fprintf(stderr,msgbuf);
 #endif
 #endif // CRAY_T3D
 #endif // AVOID_IMTOOLS
-      owns_buffer= 1;
-    }
-    else {
-      buf= initial_buf;
-      owns_buffer= 0;
-    }
-    current_pix= ImVfbQPtr( buf, 0, 0 );
-    image_valid= 1;
-    compressed_flag= 0;
-    n_comp_pixels= n_comp_runs= 0;
-    comp_pixels= NULL;
-    byte_comp_pixels= NULL;
-    comp_runs= NULL;
-    owns_compbuf= 0;
+    owns_buffer= 1;
+  }
+  else {
+    buf= initial_buf;
+    owns_buffer= 0;
+  }
+  current_pix= ImVfbQPtr( buf, 0, 0 );
+  image_valid= 1;
+  compressed_flag= 0;
+  n_comp_pixels= n_comp_runs= 0;
+  comp_pixels= NULL;
+  byte_comp_pixels= NULL;
+  comp_runs= NULL;
+  owns_compbuf= 0;
 }
 
 rgbImage::rgbImage( FILE *fp, char *fname )
@@ -135,7 +133,7 @@ rgbImage::rgbImage( FILE *fp, char *fname )
     image_valid= 0;
     return;
   }
-
+  
   // Get the input file format
   char *type= ImFileQFFormat( fp, fname );
   if (!type) {
@@ -144,7 +142,7 @@ rgbImage::rgbImage( FILE *fp, char *fname )
     TagTableFree( flagsTable );
     return;
   }
-
+  
   // Read the file
   if ( ImFileFRead( fp, type, flagsTable, dataTable ) == -1 ) {
     image_valid= 0;
@@ -152,7 +150,7 @@ rgbImage::rgbImage( FILE *fp, char *fname )
     TagTableFree( flagsTable );
     return;
   }
-
+  
   // Get the image
   TagEntry *imageEntry= TagTableQDirect( dataTable, "image vfb", 0 );
   if (!imageEntry) {
@@ -168,7 +166,7 @@ rgbImage::rgbImage( FILE *fp, char *fname )
     return;
   }
   owns_buffer= 1;
-
+  
   // Convert to RGB if necessary
   if ( !(ImVfbQFields(buf)) & IMVFBRGB ) {
     if ( !ImVfbToRgb(buf, buf) ) {
@@ -689,9 +687,12 @@ void rgbImage::rescale_by_alpha()
 	ialpha= *(runner+3);
 	if ((ialpha != 0) && (ialpha != 255)) {
 	  inv_alpha= 255.0/(float)ialpha;
-	  *runner++= bounds_check((int)(inv_alpha * *runner)); // r
-	  *runner++= bounds_check((int)(inv_alpha * *runner)); // g
-	  *runner++= bounds_check((int)(inv_alpha * *runner)); // b
+	  *runner = bounds_check((int)(inv_alpha * *runner)); //r
+	  runner++;
+	  *runner = bounds_check((int)(inv_alpha * *runner)); //g
+	  runner++;
+	  *runner = bounds_check((int)(inv_alpha * *runner)); //b
+	  runner++;
 	  *runner++= 255; // a
 	}
 	else {
@@ -919,8 +920,8 @@ save gsave \n\
 %d %d 8 [%d 0 0 %d 0 %d ] \n\
 {currentfile str readhexstring pop} false 3 colorimage \n";
 
-  static char trailer_string[]= "grestore restore showpage\n";
-
+static char trailer_string[]= "grestore restore showpage\n";
+  
   fprintf(ofile,header_string,
 	  xdim*3,
           xshift, yshift,
@@ -945,7 +946,7 @@ save gsave \n\
   }  
 
   fputs(trailer_string,ofile);
-
+  
   // Close up
   if (fclose(ofile) == EOF) {
     fprintf(stderr,"rgbImage::save: error closing file <%s>!\n",fname);
@@ -956,7 +957,7 @@ save gsave \n\
 }
 
 static int write_to_png(const char *fname, const int xdim, const int ydim,
-			 ImVfb* image)
+  ImVfb* image)
 {
 #ifdef INCL_PNG
   FILE *ofile= fopen(fname,"w");
@@ -979,27 +980,25 @@ static int write_to_png(const char *fname, const int xdim, const int ydim,
     return 0;
   }
   
-  if (setjmp(png_ptr->jmpbuf)) {
+  if (setjmp(png_jmpbuf(png_ptr))) {
     png_destroy_write_struct(&png_ptr, &info_ptr);
     fclose(ofile);
     fprintf(stderr,"rgbImage::save: fatal error in png libraries!\n");
     return 0;
   }
-
+  
   png_init_io(png_ptr, ofile);
+  
+  png_set_IHDR(png_ptr, info_ptr, xdim, ydim, 8, PNG_COLOR_TYPE_RGBA,
+	       PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+	       PNG_FILTER_TYPE_DEFAULT);
+  
+  png_set_gamma(png_ptr, 1.0, 0.45455);
 
-  info_ptr->width= xdim;
-  info_ptr->height= ydim;
-  info_ptr->color_type= PNG_COLOR_TYPE_RGBA;
-  info_ptr->bit_depth= 8;
-  info_ptr->gamma= 1.0;
-
-  info_ptr->num_text= 0;
-  info_ptr->max_text= 0;
-  info_ptr->text= NULL;
-
+  png_set_text(png_ptr, info_ptr, NULL, 0);
+  
   png_write_info(png_ptr, info_ptr);
-
+  
   png_bytep row_ptr;
   if (!(row_ptr=(png_bytep)malloc(4*xdim))) {
     png_destroy_write_struct(&png_ptr, &info_ptr);

@@ -21,8 +21,6 @@
 
 #include "starsplatter.h"
 
-static char rcsid[] = "$Id: utils.cc,v 1.26 2009-06-09 23:46:51 welling Exp $";
-
 #define CHUNKSIZE 1024
 
 // the gadget header struct
@@ -366,7 +364,10 @@ static int loadOrDiscard( const char* propName, FILE* infile,
 {
   int blockSizeBefore, blockSizeAfter;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result" 
   (void)fread(&blockSizeBefore, sizeof(blockSizeBefore), 1, infile);
+#pragma GCC diagnostic pop
   for (int i=0; i<ngroups; i++) {
     StarBunch* sb= sbunch_tbl[i];
     if (sb) {
@@ -398,7 +399,10 @@ static int loadOrDiscard( const char* propName, FILE* infile,
 	}
     }
   }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result" 
   (void)fread(&blockSizeAfter, sizeof(blockSizeAfter), 1, infile);
+#pragma GCC diagnostic pop
   if (blockSizeAfter != blockSizeBefore) {
     fprintf(stderr,"ssplat_load_gadget: blocking error on %s!\n",propName);
     return 0;
@@ -424,6 +428,9 @@ int ssplat_load_gadget ( FILE* infile, StarBunch** sbunch_tbl,
   assert(sizeof(char)==1);
 
   // read gadget header information
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result" 
+
   (void)fread(&blockSizeBefore, sizeof(blockSizeBefore), 1, infile);
   if (fread(&header, sizeof(header), 1, infile) != 1) {
     fprintf(stderr,"ssplat_load_gadget: error reading header info\n");
@@ -436,7 +443,7 @@ int ssplat_load_gadget ( FILE* infile, StarBunch** sbunch_tbl,
     *bunches_read= 0;
     return 0;
   }
-  
+#pragma GCC diagnostic pop  
   // fprintf(stderr,"flags: sfr %d, feedback %d, cooling %d \n",
   //         header.flag_sfr, header.flag_feedback, header.flag_cooling);
 
@@ -511,7 +518,10 @@ int ssplat_load_gadget ( FILE* infile, StarBunch** sbunch_tbl,
   }
 
   // Load the coordinate data
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result" 
   (void)fread(&blockSizeBefore, sizeof(blockSizeBefore), 1, infile);
+#pragma GCC diagnostic pop
   for (int i=0; i<ngroups; i++) {
     StarBunch* sb= sbunch_tbl[i];
     if (sb) {
@@ -535,7 +545,10 @@ int ssplat_load_gadget ( FILE* infile, StarBunch** sbunch_tbl,
       }
     }
   }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result" 
   (void)fread(&blockSizeAfter, sizeof(blockSizeAfter), 1, infile);
+#pragma GCC diagnostic pop
   if (blockSizeAfter != blockSizeBefore) {
     fprintf(stderr,"ssplat_load_gadget: blocking error on block 1!\n");
     *bunches_read= 0;
@@ -543,7 +556,10 @@ int ssplat_load_gadget ( FILE* infile, StarBunch** sbunch_tbl,
   }
 
   // Load velocity data
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result" 
   (void)fread(&blockSizeBefore, sizeof(blockSizeBefore), 1, infile);
+#pragma GCC diagnostic pop
   for (int i=0; i<ngroups; i++) {
     StarBunch* sb= sbunch_tbl[i];
     if (sb) {
@@ -581,7 +597,10 @@ int ssplat_load_gadget ( FILE* infile, StarBunch** sbunch_tbl,
       }
     }
   }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result" 
   (void)fread(&blockSizeAfter, sizeof(blockSizeAfter), 1, infile);
+#pragma GCC diagnostic pop
   if (blockSizeAfter != blockSizeBefore) {
     fprintf(stderr,"ssplat_load_gadget: blocking error on block 2!\n");
     *bunches_read= 0;
@@ -589,7 +608,10 @@ int ssplat_load_gadget ( FILE* infile, StarBunch** sbunch_tbl,
   }
 
   // Load ID data
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result" 
   (void)fread(&blockSizeBefore, sizeof(blockSizeBefore), 1, infile);
+#pragma GCC diagnostic pop
   for (int i=0; i<ngroups; i++) {
     StarBunch* sb= sbunch_tbl[i];
     if (sb) {
@@ -621,7 +643,10 @@ int ssplat_load_gadget ( FILE* infile, StarBunch** sbunch_tbl,
       }
     }
   }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result" 
   (void)fread(&blockSizeAfter, sizeof(blockSizeAfter), 1, infile);
+#pragma GCC diagnostic pop
   if (blockSizeAfter != blockSizeBefore) {
     fprintf(stderr,"ssplat_load_gadget: blocking error on block 3!\n");
     *bunches_read= 0;

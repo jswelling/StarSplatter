@@ -25,8 +25,6 @@
 #include "geometry.h"
 #include "starbunch.h"
 
-static char rcsid[] = "$Id: starbunch.cc,v 1.34 2008-07-25 21:08:23 welling Exp $";
-
 //////////////////////////////////////////////////////////
 // Notes-
 // -I could make a copy constructor (python clone function) out of

@@ -39,8 +39,6 @@
 #include <assert.h>
 #include "geometry.h"
 
-static char rcsid[] = "$Id: geometry.cc,v 1.11 2008-07-25 21:08:23 welling Exp $";
-
 /* Notes-
  */
 

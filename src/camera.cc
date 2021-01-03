@@ -21,8 +21,6 @@
 #include "rgbimage.h"
 #include "camera.h"
 
-static char rcsid[] = "$Id: camera.cc,v 1.11 2008-07-25 21:08:22 welling Exp $";
-
 Camera::Camera( const gPoint lookfm_in, const gPoint lookat_in, 
 		const gVector up_in, const double fovea_in, 
 		const double hither_in, const double yon_in,

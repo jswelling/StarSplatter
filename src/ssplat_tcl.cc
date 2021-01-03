@@ -22,8 +22,6 @@
 
 #include "starsplatter.h"
 
-static char rcsid[] = "$Id: ssplat_tcl.cc,v 1.31 2008-07-25 22:08:14 welling Exp $";
-
 #if (TCL_MAJOR_VERSION<8)
 #define OLD_TCL_API 1
 #endif

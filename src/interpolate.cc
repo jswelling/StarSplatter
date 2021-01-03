@@ -23,8 +23,6 @@
 
 #include "starsplatter.h"
 
-static char rcsid[] = "$Id: interpolate.cc,v 1.11 2009-06-09 23:46:51 welling Exp $";
-
 // to allow for rounding error
 #define EPSILON 0.000001
 

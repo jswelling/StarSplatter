@@ -27,8 +27,6 @@
 
 #include "starsplatter.h"
 
-static char rcsid[] = "$Id: tclrunner.cc,v 1.17 2008-07-25 21:08:24 welling Exp $";
-
 /* Notes-
  */
 

@@ -21,8 +21,6 @@
 
 #include "starsplatter.h"
 
-static char rcsid[] = "$Id: ssplat_usr_modify.cc,v 1.18 2009-06-09 23:46:51 welling Exp $";
-
 double StarSplatter::default_log_rescale_min= 0.001;
 double StarSplatter::default_log_rescale_max= 1.0;
 

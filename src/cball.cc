@@ -24,8 +24,6 @@ This class provides a 'crystal ball' type 3D motion interface.
 #include "geometry.h"
 #include "cball.h"
 
-static char rcsid[] = "$Id: cball.cc,v 1.10 2008-07-25 21:08:22 welling Exp $";
-
 /* crystal ball radius (1.0 is full width of viewport) */
 static const double CRYSTAL_BALL_RADIUS= 0.8;
 
