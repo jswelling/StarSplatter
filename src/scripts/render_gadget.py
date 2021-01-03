@@ -39,7 +39,7 @@ infile.close()
 bbox= None
 for (name,bunch) in [("gas",gas), ("disk",disk),
                      ("bulge",bulge), ("stars",stars)]:
-    print "%%%% %s: %d particles"%(name,bunch.nstars())
+    print("%%%% %s: %d particles"%(name,bunch.nstars()))
     if (bunch.nstars()>0):
         bunch.dump(sys.stdout)
         if not bbox: bbox= bunch.boundBox()
@@ -53,7 +53,7 @@ meanMassByType= { "stars":1.95e-5, "disk":1.0, "bulge":1.0, "gas":3.03e-5 }
 for (name,bunch) in [("gas",gas), ("disk",disk),
                      ("bulge",bulge), ("stars",stars)]:
 
-    print "Setting properties for %s"%name
+    print("Setting properties for %s"%name)
 
     # First we set the smoothing length based
     bunch.set_scale_length(1.0) # global scale
@@ -77,7 +77,7 @@ bulge.set_bunch_color((0.8, 0.7, 0.5, 0.1))
 
 stars.set_bunch_color((1.0, 1.0, 1.0, 0.3))
 
-print "Done setting properties"
+print("Done setting properties")
 
 # Set up camera and renderer
 mycam= createBBoxCamera(bbox,20.0)
@@ -111,4 +111,4 @@ img.add_under(black)
 
 # Save the image with the given type and name
 img.save("test.png","png")
-print "wrote test.png"
+print("wrote test.png")
