@@ -1,6 +1,6 @@
 # StarSplatter Home Document #
 
-![picture of galaxies colliding](big_merger_4_small.jpg)
+![picture of galaxies colliding](images/big_merger_4_small.jpg)
 (Galaxy merger image by Joel Welling and John Dubinski)
 
 StarSplatter is a tool for creating images and animations from astrophysical
