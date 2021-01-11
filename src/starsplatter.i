@@ -23,9 +23,7 @@ manipulate rendering geometry and rendered images."
 %feature("autodoc","1");
 
 %typemap(in) FILE* {
-  fprintf(stderr,"point 1\n");
   int fd = PyObject_AsFileDescriptor($input);
-  fprintf(stderr,"point 2: %d\n", fd);
   $1 = fdopen(fd, "r");
 }
   
