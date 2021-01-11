@@ -31,7 +31,7 @@ Funding was provided by the
 
 ## Documents ##
 
-*[Some sample images](samples.md)
+* [Some sample images](samples.md)
 <!-- <li><a href="starsplatter_users_guide_tcl.html">StarSplatter Tcl User's Guide</a> -->
 <!-- <li><a href="ftp://ftp.psc.edu/pub/starsplatter">Download the Software</a> -->
 
