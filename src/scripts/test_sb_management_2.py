@@ -55,7 +55,7 @@ sb2= mkBunch(0.3,1.0)
 
 #sb1.set_attr(starsplatter.StarBunch.DEBUG_LEVEL,1)
 
-for i in xrange(0,5):
+for i in range(0,5):
     interp= starsplatter.starbunch_interpolate(sb1,sb2,0.2*i,1.0)
     sys.stderr.write("done interpolating\n")
     sys.stderr.write("%d ...\n"%i)

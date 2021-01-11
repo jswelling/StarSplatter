@@ -39,7 +39,7 @@ infile.close()
 bbox= None
 for (name,bunch) in [("gas",gas), ("disk",disk),
                      ("bulge",bulge), ("stars",stars)]:
-    print("%%%% %s: %d particles"%(name,bunch.nstars()))
+    print(("%%%% %s: %d particles"%(name,bunch.nstars())))
     if (bunch.nstars()>0):
         bunch.dump(sys.stdout, 0)
         if not bbox: bbox= bunch.boundBox()
@@ -53,7 +53,7 @@ meanMassByType= { "stars":1.95e-5, "disk":1.0, "bulge":1.0, "gas":3.03e-5 }
 for (name,bunch) in [("gas",gas), ("disk",disk),
                      ("bulge",bulge), ("stars",stars)]:
 
-    print("Setting properties for %s"%name)
+    print(("Setting properties for %s"%name))
 
     # First we set the smoothing length based
     bunch.set_scale_length(1.0) # global scale

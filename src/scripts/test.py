@@ -37,4 +37,4 @@ black= starsplatter.rgbImage(img.xsize(),img.ysize())
 black.clear((0.0,0.0,0.0,1.0))
 img.add_under(black)
 img.save("test.png","png")
-print "wrote test.png"
+print("wrote test.png")

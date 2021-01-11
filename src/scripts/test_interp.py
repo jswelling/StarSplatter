@@ -4,11 +4,11 @@ import os
 import starsplatter
 
 def writeout(lblstr, sb):
-    print "%s follows"%lblstr
+    print("%s follows"%lblstr)
     sb.dump(sys.stdout,1)
-    for i in xrange(sb.nstars()):
-        print "%d: id= %d, valid= %d"%(i,sb.id(i),sb.valid(i))
-    print "%s has ninvalid %d"%(lblstr,group1.ninvalid())
+    for i in range(sb.nstars()):
+        print("%d: id= %d, valid= %d"%(i,sb.id(i),sb.valid(i)))
+    print("%s has ninvalid %d"%(lblstr,group1.ninvalid()))
     
 
 ############
@@ -78,7 +78,7 @@ gp1_vyProp= group1.allocate_next_free_prop_index(starsplatter.StarBunch.VEL_Y_NA
 gp1_vzProp= group1.allocate_next_free_prop_index(starsplatter.StarBunch.VEL_Z_NAME)
 gp1_fooProp= group1.allocate_next_free_prop_index("foo")
 gp1_barProp= group1.allocate_next_free_prop_index("bar")
-for i in xrange(group1.nstars()):
+for i in range(group1.nstars()):
     group1.set_prop(i,gp1_vxProp,12.0+0.1*i)
     group1.set_prop(i,gp1_vyProp,-4.0-0.1*i)
     group1.set_prop(i,gp1_vzProp,3.0+0.1*i)
@@ -90,7 +90,7 @@ gp2_vxProp= group2.allocate_next_free_prop_index(starsplatter.StarBunch.VEL_X_NA
 gp2_vyProp= group2.allocate_next_free_prop_index(starsplatter.StarBunch.VEL_Y_NAME)
 gp2_vzProp= group2.allocate_next_free_prop_index(starsplatter.StarBunch.VEL_Z_NAME)
 gp2_fooProp= group2.allocate_next_free_prop_index("foo")
-for i in xrange(group2.nstars()):
+for i in range(group2.nstars()):
     group2.set_prop(i,gp2_vxProp,2.0+0.1*i)
     group2.set_prop(i,gp2_vyProp,-14.0-0.1*i)
     group2.set_prop(i,gp2_vzProp,30.0+0.1*i)
@@ -98,5 +98,5 @@ for i in xrange(group2.nstars()):
 
 group1.set_attr(starsplatter.StarBunch.DEBUG_LEVEL,1)
 interpBunch= starsplatter.starbunch_interpolate(group1, group2, 0.73)
-print "result was %s"%interpBunch
+print("result was %s"%interpBunch)
 

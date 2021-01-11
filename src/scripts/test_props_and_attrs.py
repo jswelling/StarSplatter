@@ -21,18 +21,18 @@ gas.set_prop(7,baseNProps+1,123.4)
 gas.set_prop(3,baseNProps+2,45.6)
 gas.set_prop(5,baseNProps+0,7.8)
 gas.set_propName(0+baseNProps,"somePropName")
-print "Just set property %d+0 name to <%s>"%\
-      (baseNProps,gas.propName(baseNProps+0))
-print "Property %d+1 has no name: <%s>"%\
-      (baseNProps,gas.propName(baseNProps+1))
-print "Property %d+3 does not even exist: <%s>"%\
-      (baseNProps,gas.propName(baseNProps+3))
+print("Just set property %d+0 name to <%s>"%\
+      (baseNProps,gas.propName(baseNProps+0)))
+print("Property %d+1 has no name: <%s>"%\
+      (baseNProps,gas.propName(baseNProps+1)))
+print("Property %d+3 does not even exist: <%s>"%\
+      (baseNProps,gas.propName(baseNProps+3)))
 gas.dump(sys.stderr)
 
-print "Got attr value %d"%gas.attr(starsplatter.StarBunch.COLOR_ALG)
+print("Got attr value %d"%gas.attr(starsplatter.StarBunch.COLOR_ALG))
 
-for i in xrange(0,4):
-    for j in xrange(0,4):
+for i in range(0,4):
+    for j in range(0,4):
         which_star= (4*i)+j
         gas.set_coords(which_star,(0.5*i - 0.75, 0.5*j - 0.75, 0.0))
         gas.set_density(which_star, 0.001*i + 0.0005)

@@ -32,14 +32,14 @@ import math
 
 try:
     import starsplatter
-except Exception, e:
-    print "Can't import starsplatter: %s" % e
+except Exception as e:
+    print("Can't import starsplatter: %s" % e)
     sys.exit(-1)
 
 try:
     from wxPython.wx import *
-except Exception, e:
-    print "Can't import wxPython.wx: %s" % e
+except Exception as e:
+    print("Can't import wxPython.wx: %s" % e)
     sys.exit(-1)
 
 verboseFlag= 0
@@ -130,9 +130,9 @@ class MyImageDialog(wxFrame):
         myren.set_exposure_scale(0.5)
         myren.set_debug(debugFlag)
 
-        print "The valid camera is %s"%self.camera
+        print("The valid camera is %s"%self.camera)
         myren.clear_stars()
-        for i in xrange(len(self.bunchList)):
+        for i in range(len(self.bunchList)):
             sb= self.bunchList[i]
             sbName= self.bunchNameList[i]
             #sys.stderr.write("#### bunch %s:\n"%sbName)
@@ -146,7 +146,7 @@ class MyImageDialog(wxFrame):
             #img.save("test_over.png","png")
             return img
         except:
-            print "Render failed!"
+            print("Render failed!")
             return None
 
 class MyTextDialog(wxFrame):
@@ -369,7 +369,7 @@ class MyBunchDialog(wxFrame):
         bunch= self.bunch
         textString= "Stars: %d\n"%bunch.nstars()
         textString += "%d properties: \n"%bunch.nprops()
-        for i in xrange(bunch.nprops()):
+        for i in range(bunch.nprops()):
             textString += "   %d: %s\n"%(i,bunch.propName(i))
         textString += "bunch color RGBA= %s\n"%str(bunch.bunch_color())
         textString += "bunch density: %g\n"%bunch.density()
@@ -389,7 +389,7 @@ class MyBunchDialog(wxFrame):
  
     def OnEditColor(self,e):
         clrList= self.unscaledBunchClr
-        print "old color : %s"%str(self.unscaledBunchClr)
+        print("old color : %s"%str(self.unscaledBunchClr))
         oldClr= wxColour(math.floor((255*(clrList[0]/clrList[3]))+0.5),
                          math.floor((255*(clrList[1]/clrList[3]))+0.5),
                          math.floor((255*(clrList[2]/clrList[3]))+0.5))
@@ -419,7 +419,7 @@ class MyBunchDialog(wxFrame):
     def prepCmap1DColor(self,panel):
         propList= []
         bunch= self.bunch
-        for i in xrange(bunch.nprops()):
+        for i in range(bunch.nprops()):
             propList.append(bunch.propName(i))
         box= wxBoxSizer(wxVERTICAL)
 
@@ -477,7 +477,7 @@ class MyBunchDialog(wxFrame):
             cmap= [(0.0,0.0,1.0,1.0),
                    (1.0,1.0,0.0,1.0)]
         else:
-            print "Internal error: no know cmap for %s"%cmapName
+            print("Internal error: no know cmap for %s"%cmapName)
             cmap= [(1.0,0.0,0.0,1.0),
                    (0.0,1.0,0.0,1.0)]
             
@@ -490,7 +490,7 @@ class MyBunchDialog(wxFrame):
     def prepCmap2DColor(self,panel):
         propList= []
         bunch= self.bunch
-        for i in xrange(bunch.nprops()):
+        for i in range(bunch.nprops()):
             propList.append(bunch.propName(i))
         box= wxBoxSizer(wxVERTICAL)
         hbox= wxBoxSizer(wxHORIZONTAL)
@@ -687,15 +687,15 @@ class MainWindow(wxFrame):
     def OnCrop(self,e):
         sliceThickness= 0.01*(self.bbox.zmax()-self.bbox.zmin())
         ctr= self.bbox.center()
-        print "Slice thickness is %g, center %s"%(sliceThickness,ctr)
+        print("Slice thickness is %g, center %s"%(sliceThickness,ctr))
         highpt= (ctr[0],ctr[1],ctr[2]+(0.5*sliceThickness*ctr[3]),ctr[3])
         lowpt= (ctr[0],ctr[1],ctr[2]-(0.5*sliceThickness*ctr[3]),ctr[3])
-        for key in self.bunchDict.keys():
+        for key in list(self.bunchDict.keys()):
             (name,sb,ds)= self.bunchDict[key]
-            print "%s from %s starts with %d stars"%(name,ds,sb.nstars())
+            print("%s from %s starts with %d stars"%(name,ds,sb.nstars()))
             sb.crop(highpt,(0.0,0.0,-1.0))
             sb.crop(lowpt,(0.0,0.0,1.0))
-            print "%s now has %d stars"%(name,sb.nstars())
+            print("%s now has %d stars"%(name,sb.nstars()))
 
     def OnDollySliderChange(self,val,hookData):
         self.updateCamFromControls()
@@ -766,7 +766,7 @@ class MainWindow(wxFrame):
             self.viewmenu.AppendMenu(wxNewId()," Bunch tags",
                                      self.bunchSubMenu)
 
-        for i in xrange(len(newBunchList)):
+        for i in range(len(newBunchList)):
             thisBunch= newBunchList[i]
             if debugFlag:
                 thisBunch.set_attr(starsplatter.StarBunch.DEBUG_LEVEL,1)
@@ -783,7 +783,7 @@ class MainWindow(wxFrame):
                 self.bunchList.append(thisBunch)
                 self.bunchNameList.append(thisName)
         
-        print "Collected bunches have joint bbox %s"%self.bbox
+        print("Collected bunches have joint bbox %s"%self.bbox)
         self.camera= createBBoxCamera(self.bbox)
 ##         self.camera= starsplatter.Camera((0.0,0.0,30.0),
 ##                                               (0.0,0.0,0.0),
@@ -808,7 +808,7 @@ class MainWindow(wxFrame):
                 self.describeError("No such file %s!"%t)
             else:
                 self.dsNameList.append(t)
-        except Exception,e:
+        except Exception as e:
             fileIsReadable= 0
             mainWindow.describeError("Cannot open file: %s"%e)
 
@@ -860,7 +860,7 @@ class MainWindow(wxFrame):
         self.addBunchList(bunchList, bunchNameList)
 
     def setFile(self,t,typeString):
-        print "typestr is <%s>"%typeString
+        print("typestr is <%s>"%typeString)
         (bunchList, bunchNameList)= self.readBunchesFromFile(t,typeString)
         for thisBunch in bunchList:
             setDefaultRenderingAttributes(thisBunch)
@@ -949,7 +949,7 @@ class MainWindow(wxFrame):
         dlg.Destroy()
 
     def describeSelf(self):
-        print "%s: usage: to be determined!"%sys.argv[0]
+        print("%s: usage: to be determined!"%sys.argv[0])
         
 ##############################
 #
@@ -966,7 +966,7 @@ if len(sys.argv)>1:
 try:
     (opts,pargs) = getopt.getopt(sys.argv[1:],"vd",[])
 except:
-    print "%s: Invalid command line parameter" % sys.argv[0]
+    print("%s: Invalid command line parameter" % sys.argv[0])
     describeSelf();
     time.sleep(5)
     sys.exit()

@@ -20,15 +20,15 @@ mycam= starsplatter.Camera((0.0,0.0,30.0),
 
 myren= starsplatter.StarSplatter()
 myren2= starsplatter.StarSplatter()
-for i in xrange(0,5):
+for i in range(0,5):
     sb= mkBunch(0.5*i)
     #sbList.append(sb)
     sb.set_density(0.03)
     sb.set_scale_length(0.1)
-    print "%d..."%i,
+    print("%d..."%i, end=' ')
     myren.add_stars(sb)
     if i%2 == 0: myren2.add_stars(sb)
-    print "set."
+    print("set.")
 
 myren.set_exposure_type( starsplatter.StarSplatter.ET_LOG_HSV_AUTO )
 
@@ -37,7 +37,7 @@ myren.set_camera(mycam)
 
 img= myren.render()
 img.save("test.png","png")
-print "wrote test.png"
+print("wrote test.png")
 myren.clear_stars()
 
 myren2.set_exposure_type( starsplatter.StarSplatter.ET_LOG_HSV_AUTO )
@@ -47,6 +47,6 @@ myren2.set_camera(mycam)
 
 img= myren2.render()
 img.save("test2.png","png")
-print "wrote test2.png"
+print("wrote test2.png")
 myren2.clear_stars()
 

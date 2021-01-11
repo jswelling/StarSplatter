@@ -25,13 +25,13 @@ def cropBunchTo(sb,sbName,cropBBox):
     sb.crop((cropBBox.xmax(),cropBBox.ymax(),cropBBox.zmax()),
             (0.0,0.0,-1.0))
     if sbName!=None:
-        print "%s cropped from %d to %d stars"%(sbName,oldN,sb.nstars())
+        print("%s cropped from %d to %d stars"%(sbName,oldN,sb.nstars()))
 
 # This utility makes a complete copy of a StarBunch.
 def bunch_clone(sb):
     result= starsplatter.StarBunch()
     result.set_nprops(sb.nprops())
-    for i in xrange(sb.nprops()):
+    for i in range(sb.nprops()):
         result.allocate_next_free_prop_index(sb.propName(i))
     result.copy_stars(sb)
     return result
@@ -40,20 +40,20 @@ def setBunchProps( gas, meanMassByType ):
     #Set the rendering properties of the particles
     for (name,bunch) in [("gas",gas)]:
 
-        print "Setting properties for %s"%name
+        print("Setting properties for %s"%name)
         
         # First we set the smoothing length based
         bunch.set_scale_length(1.0) # global scale
         smoothingLengthId= bunch.get_prop_index_by_name("SmoothingLength")
         if smoothingLengthId>=0: # which means it is present
-            for i in xrange(bunch.nstars()):
+            for i in range(bunch.nstars()):
                 bunch.set_scale_length(i,bunch.prop(i,smoothingLengthId))
                 
         # Now we set the optical density
         bunch.set_density(1.0/meanMassByType[name]) # global scale
         massId= bunch.get_prop_index_by_name("Mass")
         if massId>=0: # which means it is present
-            for i in xrange(bunch.nstars()):
+            for i in range(bunch.nstars()):
                 bunch.set_density(i,bunch.prop(i,massId))
 
     # Set the coloring of the gas with a colormap
@@ -76,7 +76,7 @@ def setBunchProps( gas, meanMassByType ):
     gas.set_colormap1D(orangeHotColors,
                        0.0, 500000.0)
 
-    print "Done setting properties"
+    print("Done setting properties")
 
 
 def createBBoxCamera(bbox,fov=35.0,sepfac=1.0):
@@ -138,23 +138,23 @@ cropBunchTo(gas2_cropped,"gas2_cropped",sliceBBox)
 # bunches.  This is done based in the ID numbers in the dataset,
 # which were provided by the input data file.
 starsplatter.identify_unshared_ids(gas1_cropped,gas2_cropped)
-print "gas1_cropped now has %d invalid"%gas1_cropped.ninvalid()
-print "gas2_cropped now has %d invalid"%gas2_cropped.ninvalid()
+print("gas1_cropped now has %d invalid"%gas1_cropped.ninvalid())
+print("gas2_cropped now has %d invalid"%gas2_cropped.ninvalid())
 
 # Now the missing IDs have been added, but they are invalid- there
 # is no data associated with them.  Fill in that data if it is
 # available.
-print "Searching for missing particles"
+print("Searching for missing particles")
 gas1.set_valid(0,1) # this creates a 'validity' property
 if gas1_cropped.fill_invalid_from(gas1)==0:
-    print "fill_invalid_from(gas1_cropped) failed!"
+    print("fill_invalid_from(gas1_cropped) failed!")
     sys.exit(-1)
-print "gas1_cropped now has %d invalid"%gas1_cropped.ninvalid()
+print("gas1_cropped now has %d invalid"%gas1_cropped.ninvalid())
 gas2.set_valid(0,1) # this creates a 'validity' property
 if gas2_cropped.fill_invalid_from(gas2)==0:
-    print "fill_invalid_from(gas2_cropped) failed!"
+    print("fill_invalid_from(gas2_cropped) failed!")
     sys.exit(-1)
-print "gas2_cropped now has %d invalid"%gas2_cropped.ninvalid()
+print("gas2_cropped now has %d invalid"%gas2_cropped.ninvalid())
 
 # Set the rendering properties of the bunches
 setBunchProps( gas1_cropped, meanMassByType )
@@ -185,7 +185,7 @@ velscale= 1.0/(30.86e15)
 # alpha below is interpolated between these times
 gas1_cropped.set_time(0.0)
 gas2_cropped.set_time(1.0)
-for i in xrange(10):
+for i in range(10):
     alpha= float(i)/float(10)
     interpolatedGas= starsplatter.starbunch_interpolate(gas1_cropped,
                                                         gas2_cropped,
@@ -204,7 +204,7 @@ for i in xrange(10):
     img.add_under(black)
     fname= "frame_%03d.png"%i
     img.save(fname,"png")
-    print "wrote %s"%fname
+    print("wrote %s"%fname)
 
     # Clear the stars out of the renderer; we don't want them
     # to accumulate!

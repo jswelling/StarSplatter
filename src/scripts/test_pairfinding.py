@@ -32,16 +32,16 @@ group2.set_id(1,5)
 #group2.dump(sys.stderr)
 
 starsplatter.identify_unshared_ids(group1,group2)
-print "Group 1 follows"
+print("Group 1 follows")
 group1.dump(sys.stderr)
-for i in xrange(group1.nstars()):
-    print "%d: id= %d, valid= %d"%(i,group1.id(i),group1.valid(i))
-print "Group 1 has ninvalid %d"%group1.ninvalid()
-print "Group 2 follows"
+for i in range(group1.nstars()):
+    print("%d: id= %d, valid= %d"%(i,group1.id(i),group1.valid(i)))
+print("Group 1 has ninvalid %d"%group1.ninvalid())
+print("Group 2 follows")
 group2.dump(sys.stderr)
-for i in xrange(group2.nstars()):
-    print "%d: id= %d, valid= %d"%(i,group2.id(i),group2.valid(i))
-print "Group 2 has ninvalid %d"%group2.ninvalid()
+for i in range(group2.nstars()):
+    print("%d: id= %d, valid= %d"%(i,group2.id(i),group2.valid(i)))
+print("Group 2 has ninvalid %d"%group2.ninvalid())
 
 
 group3= starsplatter.StarBunch()
@@ -58,26 +58,26 @@ group4.set_bunch_color((0.0,0.0,1.0,1.0))
 group4.set_id(0,5)
 group4.set_valid(0,1)
 
-print "Fill from group3 returns %d"%group1.fill_invalid_from(group3)
-print "Fill from group4 returns %d"%group1.fill_invalid_from(group4)
+print("Fill from group3 returns %d"%group1.fill_invalid_from(group3))
+print("Fill from group4 returns %d"%group1.fill_invalid_from(group4))
 
-print "Filled group1 follows"
+print("Filled group1 follows")
 group1.dump(sys.stderr,1)
-print "     ",
-for j in xrange(group1.nprops()):
-    print "%10s"%group1.propName(j),
-print ""
-for i in xrange(group1.nstars()):
-    print "%d"%i,
-    for j in xrange(group1.nprops()):
+print("     ", end=' ')
+for j in range(group1.nprops()):
+    print("%10s"%group1.propName(j), end=' ')
+print("")
+for i in range(group1.nstars()):
+    print("%d"%i, end=' ')
+    for j in range(group1.nprops()):
         if group1.propName(j)=="particleID":
-            print "%10d"%group1.id(i),
+            print("%10d"%group1.id(i), end=' ')
         elif group1.propName(j)=="particleRecValid":
-            print "%10d"%group1.valid(i),
+            print("%10d"%group1.valid(i), end=' ')
         else:
-            print "%10g"%group1.prop(i,j),
-    print ""
+            print("%10g"%group1.prop(i,j), end=' ')
+    print("")
     
 
-print "End of function"
+print("End of function")
 

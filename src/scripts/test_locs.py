@@ -45,4 +45,4 @@ for sb in [ group1, group2, group3, group4 ]:
 
 img= myren.render()
 img.save("test.png","png")
-print "wrote test.png"
+print("wrote test.png")

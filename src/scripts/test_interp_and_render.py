@@ -39,7 +39,7 @@ group2.set_prop(0,gp2Mass,2.2)
 group2.set_bunch_color((1.0,1.0,1.0,1.0))
 
 interpolated= None
-for i in xrange(9):
+for i in range(9):
      intBunch= starsplatter.starbunch_interpolate(group1, group2, 0.1*(i+1))
      if (interpolated==None): interpolated= intBunch
      else: interpolated.copy_stars(intBunch)
@@ -53,7 +53,7 @@ interpolated.set_attr(starsplatter.StarBunch.COLOR_ALG,
                       starsplatter.StarBunch.CM_COLORMAP_1D)
 massIndex= interpolated.get_prop_index_by_name("mass")
 interpolated.set_attr(starsplatter.StarBunch.COLOR_PROP1, massIndex)
-print "interpolated follows"
+print("interpolated follows")
 interpolated.dump(sys.stderr,1)
                              
 bunchList= [group1, group2, interpolated]

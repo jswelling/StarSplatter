@@ -28,7 +28,7 @@ def drawLine( sb, startIndex, n, startPt, endPt ):
      dx= sx/(n-1)
      dy= sy/(n-1)
      dz= sz/(n-1)
-     for i in xrange(n):
+     for i in range(n):
           sb.set_coords(i+startIndex,(startPt[0]+i*dx,
                                       startPt[1]+i*dy,
                                       startPt[2]+i*dz))
@@ -135,7 +135,7 @@ bunchList.append(group2)
 #group1.set_attr(starsplatter.StarBunch.DEBUG_LEVEL,1)
 interpolated= None
 nsteps= 30
-for i in xrange(nsteps):
+for i in range(nsteps):
      intBunch= starsplatter.starbunch_interpolate_periodic_bc(group1, group2,
                                                               1.0*(i+1)/(nsteps+1),
                                                               worldBB)
@@ -149,7 +149,7 @@ interpolated.set_attr(starsplatter.StarBunch.COLOR_ALG,
                       starsplatter.StarBunch.CM_COLORMAP_1D)
 massIndex= interpolated.get_prop_index_by_name("mass")
 interpolated.set_attr(starsplatter.StarBunch.COLOR_PROP1, massIndex)
-print "interpolated follows"
+print("interpolated follows")
 interpolated.dump(sys.stdout,1)
 
 bunchList.append(interpolated)

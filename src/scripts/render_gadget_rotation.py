@@ -12,20 +12,20 @@ def setBunchProps( gas, disk, bulge, stars, meanMassByType ):
     for (name,bunch) in [("gas",gas), ("disk",disk),
                          ("bulge",bulge), ("stars",stars)]:
 
-        print "Setting properties for %s"%name
+        print("Setting properties for %s"%name)
 
         # First we set the smoothing length based
         bunch.set_scale_length(1.0) # global scale
         smoothingLengthId= bunch.get_prop_index_by_name("SmoothingLength")
         if smoothingLengthId>=0: # which means it is present
-            for i in xrange(bunch.nstars()):
+            for i in range(bunch.nstars()):
                 bunch.set_scale_length(i,bunch.prop(i,smoothingLengthId))
 
         # Now we set the optical density
         bunch.set_density(1.0/meanMassByType[name]) # global scale
         massId= bunch.get_prop_index_by_name("Mass")
         if massId>=0: # which means it is present
-            for i in xrange(bunch.nstars()):
+            for i in range(bunch.nstars()):
                 bunch.set_density(i,bunch.prop(i,massId))
 
     gas.set_bunch_color((0.8, 0.5, 1.0, 0.1))
@@ -33,7 +33,7 @@ def setBunchProps( gas, disk, bulge, stars, meanMassByType ):
     bulge.set_bunch_color((0.8, 0.7, 0.5, 0.1))
     stars.set_bunch_color((1.0, 1.0, 1.0, 0.3))
 
-    print "Done setting properties"
+    print("Done setting properties")
 
 
 def createBBoxCamera(bbox,fov=35.0,sepfac=1.0):
@@ -73,7 +73,7 @@ infile.close()
 bbox= None
 for (name,bunch) in [("gas",gas), ("disk",disk),
                      ("bulge",bulge), ("stars",stars)]:
-    print "%%%% %s: %d particles"%(name,bunch.nstars())
+    print("%%%% %s: %d particles"%(name,bunch.nstars()))
     if (bunch.nstars()>0):
         bunch.dump(sys.stdout)
         if not bbox: bbox= bunch.boundBox()
@@ -136,7 +136,7 @@ black.clear((0.0,0.0,0.0,1.0))
 
 # Render a series of images rotating the data about the world's Y
 # axis.
-for i in xrange(16):
+for i in range(16):
     theta= 360.0*(float(i)/16.0) # theta is in degrees
     rotTrans= starsplatter.gTransfm.rotation((0.0,1.0,0.0),theta)
     myren.set_transform(rotTrans)
@@ -144,5 +144,5 @@ for i in xrange(16):
     img.add_under(black)
     fname= "frame_%03d.png"%i
     img.save(fname,"png")
-    print "wrote %s"%fname
+    print("wrote %s"%fname)
 
