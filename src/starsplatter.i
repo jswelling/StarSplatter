@@ -23,19 +23,12 @@ manipulate rendering geometry and rendered images."
 %feature("autodoc","1");
 
 %typemap(in) FILE* {
-  if (PyFile_Check($input)) {
-    $1 = PyFile_AsFile($input);
-  }
-  else {
-    PyErr_SetString(PyExc_TypeError,"Input is not a file!");
-    return NULL;
-  }
+  fprintf(stderr,"point 1\n");
+  int fd = PyObject_AsFileDescriptor($input);
+  fprintf(stderr,"point 2: %d\n", fd);
+  $1 = fdopen(fd, "r");
 }
-
-%typecheck(SWIG_TYPECHECK_POINTER) FILE* {
-  $1 = PyFile_Check($input) ? 1 : 0;
-}
-
+  
 class gPoint {
 public:
   gPoint( float xin, float yin, float zin );
@@ -665,7 +658,7 @@ public:
   double density();
   double exp_constant();
   double scale_length();
-  void dump( FILE* ofile, const int dump_coords= 0 );
+/*   void dump( PyObject* ofile, const int dump_coords= 0 );  // FILE* is a problem; replace with %extend */
   int has_ids();
   int has_valids();
   int has_per_part_densities();
@@ -720,6 +713,16 @@ public:
   int get_prop_index_by_name(const char* name); // returns -1 on failure
   void wrap_periodic( const gBoundBox& newWorldBBox );
 };
+
+%extend StarBunch {
+  void dump(PyObject* fp, const int dump_coords=0) {
+    FILE* f = fdopen(PyObject_AsFileDescriptor(fp), "w");
+    self->dump(f, dump_coords);
+    fflush(f);
+ }
+}
+
+
 
 // This routine returns non-zero on success- turn it into an exception
 %rename(load_tipsy_box_ascii) ssplat_load_tipsy_box_ascii; // it will be in module namespace
@@ -892,15 +895,13 @@ public:
   void set_camera( const Camera& cam_in );
   void set_transform( const gTransfm& trans_in );
 %pythonprepend clear_stars() %{
-	ren= args[0]
+        ren= args[0]
         ren.liveBunches= []
 %}
   void clear_stars();
 %pythonappend add_stars(StarBunch*) %{
-	ren= args[0]
-	sb= args[1]
-        if not hasattr(ren,"liveBunches"): ren.liveBunches= []
-        ren.liveBunches.append(sb)
+        if not hasattr(self, "liveBunches"): self.liveBunches= []
+        self.liveBunches.append(sbunch_in)
 %}
   void add_stars( StarBunch* sbunch_in ); // Bunch is not copied!
   %exception render {
@@ -927,6 +928,7 @@ public:
   const int camera_set();
   const Camera& camera();
   void dump( FILE* ofile );
+/*   void dump( PyObject* ofile );  // FILE* is a problem; replace with %extend */
   void set_debug( const int flag );
   int debug();
   void set_exposure_type( const StarSplatter::ExposureType type );
@@ -940,3 +942,11 @@ public:
   SplatType splat_type();
   void set_splat_type( SplatType splatType );
 };
+
+%extend StarSplatter {
+  void dump(PyObject* fp) {
+    FILE* f = fdopen(PyObject_AsFileDescriptor(fp), "w");
+    self->dump(f);
+    fflush(f);
+ }
+}

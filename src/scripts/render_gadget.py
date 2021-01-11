@@ -41,7 +41,7 @@ for (name,bunch) in [("gas",gas), ("disk",disk),
                      ("bulge",bulge), ("stars",stars)]:
     print("%%%% %s: %d particles"%(name,bunch.nstars()))
     if (bunch.nstars()>0):
-        bunch.dump(sys.stdout)
+        bunch.dump(sys.stdout, 0)
         if not bbox: bbox= bunch.boundBox()
         else: bbox.union_with(bunch.boundBox())
 
@@ -59,14 +59,14 @@ for (name,bunch) in [("gas",gas), ("disk",disk),
     bunch.set_scale_length(1.0) # global scale
     smoothingLengthId= bunch.get_prop_index_by_name("SmoothingLength")
     if smoothingLengthId>=0: # which means it is present
-        for i in xrange(bunch.nstars()):
+        for i in range(bunch.nstars()):
             bunch.set_scale_length(i,bunch.prop(i,smoothingLengthId))
 
     # Now we set the optical density
     bunch.set_density(1.0/meanMassByType[name]) # global scale
     massId= bunch.get_prop_index_by_name("Mass")
     if massId>=0: # which means it is present
-        for i in xrange(bunch.nstars()):
+        for i in range(bunch.nstars()):
             bunch.set_density(i,bunch.prop(i,massId))
 
 gas.set_bunch_color((0.8, 0.5, 1.0, 0.1))
@@ -104,6 +104,7 @@ myren.set_splat_type( starsplatter.StarSplatter.SPLAT_SPLINE )
 # so create one and composite this image on top.
 for sb in [gas, disk, bulge, stars]:
     myren.add_stars(sb)
+myren.dump(sys.stdout)
 img= myren.render()
 black= starsplatter.rgbImage(img.xsize(),img.ysize())
 black.clear((0.0,0.0,0.0,1.0))
