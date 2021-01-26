@@ -3,6 +3,12 @@
 This document contains sample images and animations produced with the
 __StarSplatter__ renderer for astrophysical particle data.
 
+This image is from a 2008 Gadget simulation by Tiziana DeMateo and Rupert Croft,
+showing a time point from a large animation with the locations and sizes of black
+holes shown with overlaid circles.
+
+![DeMateo 1](images/demateo_sim_with_overlays.png)
+
 These images show stages of a 3.5M particle evolution using a 
 self-consistent field method, done at the Pittsburgh Supercomputing
 Center by Joel Welling and John Dubinski.  This is a model of the merger
